@@ -193,7 +193,7 @@ class MainWindow(QtGui.QMainWindow):
             
         dt = datetime.now()
         if dt.hour == 20  or dt.hour == 8:
-            if dt.minute == 40  and dt.second == 0:
+            if dt.minute == 58  and dt.second == 0:
                 self.disconnectCtp()
     
     #----------------------------------------------------------------------
@@ -211,7 +211,7 @@ class MainWindow(QtGui.QMainWindow):
 
     #----------------------------------------------------------------------
     def disconnectCtp(self):
-        """连接CTP接口"""
+        """重连CTP接口"""
         self.mainEngine.disconnect('CTP')
 
 

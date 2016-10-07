@@ -1,7 +1,7 @@
 [
     {
-        "name": "double ema",
-        "className": "TalibDoubleSmaDemo",
+        "name": "AtrRsiStrategy",
+        "className": "AtrRsiStrategy",
         "vtSymbol": "ag1612"
     }
 ]

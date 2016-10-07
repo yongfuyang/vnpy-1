@@ -303,12 +303,36 @@ class CtaEngine(object):
             posBuffer.updatePositionData(pos)
 
     #----------------------------------------------------------------------
+    def processExchangePositionEvent(self, event):
+        pos = event.dict_['data']
+        if pos.vtSymbol in self.tickStrategyDict:
+            for strategy in self.tickStrategyDict[pos.vtSymbol]:
+                if pos.direction == DIRECTION_LONG:
+                    strategy.exchangePos = pos.position
+                else:
+                    strategy.exchangePos = -pos.position
+                strategy.onPosition(pos)
+
+    #---------------------------------------------------------------------
+    def onTimer(self, event):
+        dt = datetime.now()
+        if dt.hour == 21 and dt.minute == 0 and dt.second == 1:  # 夜盘开盘第一时间重置
+            self.posBufferDict = {}  # 清空则默认使用平昨
+
+        if self.tickStrategyDict:
+            for key in self.tickStrategyDict:
+                for strategy in self.tickStrategyDict[key]:
+                    strategy.onTimer()
+        pass
+
+    #----------------------------------------------------------------------
     def registerEvent(self):
         """注册事件监听"""
         self.eventEngine.register(EVENT_TICK, self.procecssTickEvent)
         self.eventEngine.register(EVENT_ORDER, self.processOrderEvent)
         self.eventEngine.register(EVENT_TRADE, self.processTradeEvent)
-        self.eventEngine.register(EVENT_POSITION, self.processPositionEvent)
+        self.eventEngine.register(EVENT_POSITION, self.processExchangePositionEvent)
+        self.eventEngine.register(EVENT_TIMER, self.onTimer)
 
     #----------------------------------------------------------------------
     def insertData(self, dbName, collectionName, data):
@@ -331,6 +355,17 @@ class CtaEngine(object):
                 l.append(bar)
             
         return l
+
+    #------------------------------------------------------------------------
+    def getMinute15Bar(self,bars):
+        """合成15分钟线"""
+
+        for bar in bars:
+            if bar.datetime.minute % 15 == 0 :
+                pass
+
+
+
     
     #----------------------------------------------------------------------
     def loadTick(self, dbName, collectionName, days):

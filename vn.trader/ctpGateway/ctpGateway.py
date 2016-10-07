@@ -457,6 +457,7 @@ class CtpTdApi(TdApi):
         self.posDetailBufferDict = {}       # 缓存持仓明细数据的字典
         self.symbolExchangeDict = {}        # 保存合约代码和交易所的印射关系
         self.symbolSizeDict = {}            # 保存合约代码和合约大小的印射关系
+
         
     #----------------------------------------------------------------------
     def onFrontConnected(self):
