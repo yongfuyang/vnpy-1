@@ -288,7 +288,7 @@ class BasicMonitor(QtGui.QTableWidget):
         # 如果允许了排序功能，则插入数据前必须关闭，否则插入新的数据会变乱
         if self.sorting:
             self.setSortingEnabled(False)
-        
+
         # 如果设置了dataKey，则采用存量更新模式
         if self.dataKey:
             key = data.__getattribute__(self.dataKey)
@@ -352,6 +352,14 @@ class BasicMonitor(QtGui.QTableWidget):
     def setSorting(self, sorting):
         """设置是否允许根据表头排序"""
         self.sorting = sorting
+
+    #-----------------------------------------------------------------------
+    def clearRows(self):
+        """清空表格"""
+        for row in range(self.rowCount()):
+            self.removeRow(0)
+            self.dataDict.clear()
+
         
     #----------------------------------------------------------------------
     def saveToCsv(self):

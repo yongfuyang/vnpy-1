@@ -21,6 +21,7 @@ class MainWindow(QtGui.QMainWindow):
         self.eventEngine = eventEngine
         
         self.widgetDict = {}    # 用来保存子窗口的字典
+        self.monitorDict = {}   # 用来保持监控窗口的字典
         
         self.initUi()
         self.loadWindowSettings()
@@ -37,14 +38,23 @@ class MainWindow(QtGui.QMainWindow):
     def initCentral(self):
         """初始化中心区域"""
         widgetMarketM, dockMarketM = self.createDock(MarketMonitor, u'行情', QtCore.Qt.RightDockWidgetArea)
+        self.monitorDict['Market'] = widgetMarketM
         widgetLogM, dockLogM = self.createDock(LogMonitor, u'日志', QtCore.Qt.BottomDockWidgetArea)
+        self.monitorDict['Log'] = widgetLogM
         widgetErrorM, dockErrorM = self.createDock(ErrorMonitor, u'错误', QtCore.Qt.BottomDockWidgetArea)
+        self.monitorDict['Error'] = widgetErrorM
         widgetTradeM, dockTradeM = self.createDock(TradeMonitor, u'成交', QtCore.Qt.BottomDockWidgetArea)
+        self.monitorDict['Trade'] = widgetTradeM
         widgetOrderM, dockOrderM = self.createDock(OrderMonitor, u'委托', QtCore.Qt.RightDockWidgetArea)
+        self.monitorDict['Order'] = widgetOrderM
         widgetPositionM, dockPositionM = self.createDock(PositionMonitor, u'持仓', QtCore.Qt.BottomDockWidgetArea)
+        self.monitorDict['Position'] = widgetPositionM
         widgetPositionDetailM, dockPositionDetailM = self.createDock(PositionDetailMonitor, u'持仓明细', QtCore.Qt.BottomDockWidgetArea)
+        self.monitorDict['PositionDetail'] = widgetPositionDetailM
         widgetAccountM, dockAccountM = self.createDock(AccountMonitor, u'资金', QtCore.Qt.BottomDockWidgetArea)
+        self.monitorDict['Account'] = widgetAccountM
         widgetTradingW, dockTradingW = self.createDock(TradingWidget, u'交易', QtCore.Qt.LeftDockWidgetArea)
+
     
         self.tabifyDockWidget(dockTradeM, dockErrorM)
         self.tabifyDockWidget(dockTradeM, dockLogM)
@@ -59,7 +69,20 @@ class MainWindow(QtGui.QMainWindow):
         widgetPositionM.itemDoubleClicked.connect(widgetTradingW.closePosition)
         widgetPositionDetailM.itemDoubleClicked.connect(widgetTradingW.closePosition)
         widgetMarketM.itemDoubleClicked.connect(widgetTradingW.getPrice)
-        
+
+
+    #----------------------------------------------------------------------
+    def clearMonitors(self):
+        #self.monitorDict['Market'].clearRows()
+        self.monitorDict['Log'].clearRows()
+        #self.monitorDict['Error'].clearRows()
+        self.monitorDict['Trade'].clearRows()
+        self.monitorDict['Order'].clearRows()
+        self.monitorDict['Position'].clearRows()
+        self.monitorDict['PositionDetail'].clearRows()
+        self.monitorDict['Account'].clearRows()
+
+
     #----------------------------------------------------------------------
     def initMenu(self):
         """初始化菜单"""
@@ -194,7 +217,7 @@ class MainWindow(QtGui.QMainWindow):
         dt = datetime.now()
         if dt.hour == 20  or dt.hour == 8:
             if dt.minute == 58  and dt.second == 0:
-                self.disconnectCtp()
+                self.connectCtp()
     
     #----------------------------------------------------------------------
     def getCpuMemory(self):
@@ -207,12 +230,14 @@ class MainWindow(QtGui.QMainWindow):
     def connectCtp(self):
         """连接CTP接口"""
         self.mainEngine.connect('CTP')
+        self.clearMonitors()
         self.mainEngine.dbConnect()
 
     #----------------------------------------------------------------------
     def disconnectCtp(self):
         """重连CTP接口"""
         self.mainEngine.disconnect('CTP')
+        self.clearMonitors()
 
 
     #----------------------------------------------------------------------

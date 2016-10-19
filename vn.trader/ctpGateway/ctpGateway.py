@@ -678,7 +678,7 @@ class CtpTdApi(TdApi):
                self.posBufferDictShfe = {}  #  返回后就重置
         else:
            pos = posBuffer.updateBuffer(data, size)
-        if pos:
+        if pos.symbol:
             self.gateway.onPosition(pos)
     
     #----------------------------------------------------------------------
@@ -806,7 +806,7 @@ class CtpTdApi(TdApi):
 
         posBuffer = PositionBuffer2(data, self.gatewayName)
         pos =  posBuffer.updateBuffer(data)
-        if pos:
+        if pos.symbol:
             self.gateway.onPositionDetail(pos)
     
     #----------------------------------------------------------------------
