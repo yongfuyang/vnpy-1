@@ -75,7 +75,7 @@ class MainWindow(QtGui.QMainWindow):
     def clearMonitors(self):
         #self.monitorDict['Market'].clearRows()
         self.monitorDict['Log'].clearRows()
-        #self.monitorDict['Error'].clearRows()
+        self.monitorDict['Error'].clearRows()
         self.monitorDict['Trade'].clearRows()
         self.monitorDict['Order'].clearRows()
         self.monitorDict['Position'].clearRows()
@@ -218,6 +218,8 @@ class MainWindow(QtGui.QMainWindow):
         if dt.hour == 20  or dt.hour == 8:
             if dt.minute == 58  and dt.second == 0:
                 self.connectCtp()
+                sleep(10)
+                self.disconnectCtp()
     
     #----------------------------------------------------------------------
     def getCpuMemory(self):
@@ -230,7 +232,7 @@ class MainWindow(QtGui.QMainWindow):
     def connectCtp(self):
         """连接CTP接口"""
         self.mainEngine.connect('CTP')
-        self.clearMonitors()
+        #self.clearMonitors()
         self.mainEngine.dbConnect()
 
     #----------------------------------------------------------------------

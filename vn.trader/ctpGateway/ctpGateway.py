@@ -114,7 +114,8 @@ class CtpGateway(VtGateway):
         # 创建行情和交易接口对象
         self.mdApi.connect(userID, password, brokerID, mdAddress)
         self.tdApi.connect(userID, password, brokerID, tdAddress)
-        
+        self.mdConnected = True
+        self.tdConnected = True
         # 初始化并启动查询
         self.initQuery()
 
@@ -122,7 +123,8 @@ class CtpGateway(VtGateway):
     def disconnect(self):
         #断开链接
         #self.mdApi.close()
-        self.tdApi.close()
+        if self.tdConnected:
+            self.tdApi.close()
     
     #----------------------------------------------------------------------
     def subscribe(self, subscribeReq):
@@ -398,6 +400,7 @@ class CtpMdApi(MdApi):
         else:
             if not self.loginStatus:
                 self.login()
+
         
     #----------------------------------------------------------------------
     def subscribe(self, subscribeReq):
