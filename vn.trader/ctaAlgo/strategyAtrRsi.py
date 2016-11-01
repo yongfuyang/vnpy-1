@@ -252,8 +252,8 @@ class AtrRsiStrategy(CtaTemplate):
             self.lastEntryPrice = pos.price
             self.isPrePosHaved = True
 
-        print  (u'{0} {1}  历史持仓 {2}  开仓均价 {3}'.format(datetime.now(), self.vtSymbol, self.pos, pos.price))
-        pass
+        #print  (u'{0} {1}  历史持仓 {2}  开仓均价 {3}'.format(datetime.now(), self.vtSymbol, self.pos, pos.price))
+        #pass
 
 
 if __name__ == '__main__':
