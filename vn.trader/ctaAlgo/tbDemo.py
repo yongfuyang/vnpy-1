@@ -2,10 +2,12 @@
 
 import talib as ta
 import numpy as np
+import copy
 
 from ctaBase import *
 from ctaTemplate import CtaTemplate
 
+from datetime import datetime, timedelta
 
 ########################################################################
 class TalibDoubleSmaDemo(CtaTemplate):
@@ -22,6 +24,10 @@ class TalibDoubleSmaDemo(CtaTemplate):
     # 策略变量
     bar = None
     barMinute = EMPTY_STRING
+
+    customBar = None
+    nextBegin = True
+    firstvolumes = 0
 
     closeHistory = []       # 缓存K线收盘价的数组
     maxHistory = 50         # 最大缓存数量
@@ -55,14 +61,20 @@ class TalibDoubleSmaDemo(CtaTemplate):
         """Constructor"""
         super(TalibDoubleSmaDemo, self).__init__(ctaEngine, setting)
 
+
+
     # ----------------------------------------------------------------------
     def onInit(self):
         """初始化策略（必须由用户继承实现）"""
         self.writeCtaLog(u'双SMA演示策略初始化')
 
         initData = self.loadBar(self.initDays)
+
         for bar in initData:
-            self.onBar(bar)
+            if self.timesDict:
+                self.procecssCustomBar(bar)
+            else:
+                self.onBar(bar)
 
         self.putEvent()
 
@@ -86,7 +98,14 @@ class TalibDoubleSmaDemo(CtaTemplate):
 
         if tickMinute != self.barMinute:
             if self.bar:
-                self.onBar(self.bar)
+                newBar = copy.copy(self.bar)
+                newBar.datetime = tick.datetime.replace(second=0, microsecond=0)
+                newBar.date = tick.date
+                newBar.time = tick.time
+                if self.timesDict:
+                    self.procecssCustomBar(newBar)
+                else:
+                    self.onBar(newBar)
 
             bar = CtaBarData()
             bar.vtSymbol = tick.vtSymbol
@@ -103,8 +122,9 @@ class TalibDoubleSmaDemo(CtaTemplate):
             bar.datetime = tick.datetime  # K线的时间设为第一个Tick的时间
 
             # 实盘中用不到的数据可以选择不算，从而加快速度
-            # bar.volume = tick.volume
-            # bar.openInterest = tick.openInterest
+
+            #self.firstvolumes = tick.volume
+            #bar.openInterest = tick.openInterest
 
             self.bar = bar  # 这种写法为了减少一层访问，加快速度
             self.barMinute = tickMinute  # 更新当前的分钟
@@ -115,6 +135,9 @@ class TalibDoubleSmaDemo(CtaTemplate):
             bar.high = max(bar.high, tick.lastPrice)
             bar.low = min(bar.low, tick.lastPrice)
             bar.close = tick.lastPrice
+            # 实盘中用不到的数据可以选择不算，从而加快速度
+            #bar.volume = tick.volume - self.firstvolumes  # 最后一个tick的成交量和第一个tick的成交量的差是一分钟的成交量
+            #bar.openInterest = tick.openInterest  # 持仓量直接更新
 
     # ----------------------------------------------------------------------
     def onBar(self, bar):
@@ -176,3 +199,63 @@ class TalibDoubleSmaDemo(CtaTemplate):
         """收到成交推送（必须由用户继承实现）"""
         # 对于无需做细粒度委托控制的策略，可以忽略onOrder
         pass
+
+    # ----------------------------------------------------------------------
+    def onPosition(self, pos):
+
+        if self.isPrePosHaved or self.isAlreadyTraded:  # 还没有开过仓，或，还没有获取历史仓位
+            return
+        elif pos.position != 0:
+            if pos.direction == DIRECTION_LONG:
+                self.pos = pos.position
+            else:
+                self.pos = -1 * pos.position
+            self.lastEntryPrice = pos.price
+            self.isPrePosHaved = True
+
+    # -----------------------------------------------------------------------
+    def barInTime(self, d):
+        inTime = False
+        if self.timesDict:
+            for time in self.timesDict:
+                if time == d.time:
+                    inTime = True
+        return inTime
+
+   #----------------------------------------------------------------------------
+    def procecssCustomBar(self,bar):
+
+        if self.nextBegin:
+            customBar = CtaBarData()
+            customBar.vtSymbol = bar.vtSymbol
+            customBar.symbol = bar.vtSymbol
+            customBar.exchange = bar.exchange
+            customBar.open = bar.open
+            customBar.high = bar.high
+            customBar.low = bar.low
+            customBar.close = bar.close
+            customBar.date = bar.date
+            customBar.time = bar.time
+            customBar.datetime = bar.datetime
+            #customBar.volume = int(float(bar.volume))
+            #customBar.openInterest = bar.openInterest
+            self.customBar = customBar
+            self.nextBegin = False
+        else:
+            customBar = self.customBar
+            customBar.high = max(customBar.high, bar.high)
+            customBar.low = min(customBar.low, bar.low)
+            customBar.close = bar.close
+            #customBar.volume = customBar.volume + int(float(bar.volume))
+            #customBar.openInterest = bar.openInterest
+        if self.barInTime(bar):
+            customBar.datetime = bar.datetime.replace(second=0,microsecond=0)
+            customBar.date = bar.date
+            customBar.time = bar.time
+            self.nextBegin = True
+            self.onBar(customBar)
+
+
+
+
+

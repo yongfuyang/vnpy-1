@@ -7,7 +7,7 @@
             "request": "launch",
             "stopOnEntry": true,
             "program": "${file}",
-            "pythonPath": "/usr/local/anaconda2/bin/python2",
+            "pythonPath": "/opt/anaconda2/bin/python2",
             "debugOptions": [
                 "WaitOnAbnormalExit",
                 "WaitOnNormalExit",
@@ -20,7 +20,7 @@
             "request": "launch",
             "stopOnEntry": true,
             "program": "${file}",
-            "pythonPath": "/usr/local/anaconda2/bin/python2",
+            "pythonPath": "/opt/anaconda2/bin/python2",
             "externalConsole": true,
             "debugOptions": [
                 "WaitOnAbnormalExit",
@@ -33,7 +33,7 @@
             "request": "launch",
             "stopOnEntry": true,
             "program": "${workspaceRoot}/manage.py",
-            "pythonPath": "/usr/local/anaconda2/bin/python2",
+            "pythonPath": "/opt/anaconda2/bin/python2",
             "args": [
                 "runserver",
                 "--noreload"
@@ -51,7 +51,7 @@
             "request": "launch",
             "stopOnEntry": true,
             "program": "${workspaceRoot}/console.py",
-            "pythonPath": "/usr/local/anaconda2/bin/python2",
+            "pythonPath": "/opt/anaconda2/bin/python2",
             "args": [
                 "dev",
                 "runserver",

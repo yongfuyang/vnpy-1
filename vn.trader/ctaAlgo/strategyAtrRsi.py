@@ -87,6 +87,7 @@ class AtrRsiStrategy(CtaTemplate):
         # 策略类中的这些可变对象属性可以选择不写，全都放在__init__下面，写主要是为了阅读
         # 策略时方便（更多是个编程习惯的选择）
 
+
         self.isPrePosHaved = False
         self.isAlreadyTraded = False
 
@@ -241,7 +242,7 @@ class AtrRsiStrategy(CtaTemplate):
 
     #----------------------------------------------------------------------
     def onPosition(self, pos):
-        
+
         if  self.isPrePosHaved  or self.isAlreadyTraded:         # 还没有开过仓，或，还没有获取历史仓位
             return
         elif pos.position != 0:
@@ -272,27 +273,40 @@ if __name__ == '__main__':
     engine.setStartDate('20120101')
 
     # 设置产品相关参数
-    engine.setSlippage(0.2)     # 股指1跳
-    engine.setRate(0.3/10000)   # 万0.3
-    engine.setSize(300)         # 股指合约大小
+    engine.setSlippage(0.2)  # 股指1跳
+    engine.setRate(0.3 / 10000)  # 万0.3
+    engine.setSize(300)  # 股指合约大小
 
     # 设置使用的历史数据库
     engine.setDatabase(MINUTE_DB_NAME, 'IF0000')
 
-    # 在引擎中创建策略对象
-    d = {'atrLength': 11}
-    engine.initStrategy(AtrRsiStrategy, d)
+    ## 在引擎中创建策略对象
+    # d = {'atrLength': 11}
+    # engine.initStrategy(AtrRsiStrategy, d)
 
-    # 开始跑回测
-    engine.runBacktesting()
+    ## 开始跑回测
+    ##engine.runBacktesting()
 
-    # 显示回测结果
-    engine.showBacktestingResult()
+    ## 显示回测结果
+    ##engine.showBacktestingResult()
 
-    # # 跑优化
-    # setting = OptimizationSetting()                 # 新建一个优化任务设置对象
-    # setting.setOptimizeTarget('capital')            # 设置优化排序的目标是策略净盈利
-    # setting.addParameter('atrLength', 11, 12, 1)    # 增加第一个优化参数atrLength，起始11，结束12，步进1
-    # setting.addParameter('atrMa', 20, 30, 5)        # 增加第二个优化参数atrMa，起始20，结束30，步进1
-    # engine.runOptimization(AtrRsiStrategy, setting) # 运行优化函数，自动输出结果
+    # 跑优化
+    setting = OptimizationSetting()  # 新建一个优化任务设置对象
+    setting.setOptimizeTarget('capital')  # 设置优化排序的目标是策略净盈利
+    setting.addParameter('atrLength', 11, 20, 1)  # 增加第一个优化参数atrLength，起始11，结束12，步进1
+    setting.addParameter('atrMa', 20, 30, 5)  # 增加第二个优化参数atrMa，起始20，结束30，步进1
+
+    # 性能测试环境：I7-3770，主频3.4G, 8核心，内存16G，Windows 7 专业版
+    # 测试时还跑着一堆其他的程序，性能仅供参考
+    import time
+
+    start = time.time()
+
+    # 运行单进程优化函数，自动输出结果，耗时：359秒
+    # engine.runOptimization(AtrRsiStrategy, setting)
+
+    # 多进程优化，耗时：89秒
+    engine.runParallelOptimization(AtrRsiStrategy, setting)
+
+    print u'耗时：%s' % (time.time() - start)
 

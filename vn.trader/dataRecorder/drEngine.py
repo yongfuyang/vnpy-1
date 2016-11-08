@@ -25,8 +25,9 @@ class DrEngine(object):
     """数据记录引擎"""
     
     settingFileName = 'DR_setting.json'
-    settingFileName = os.getcwd() + '/dataRecorder/' + settingFileName
-
+    #settingFileName = os.getcwd() + '/dataRecorder/' + settingFileName
+    path = os.path.abspath(os.path.dirname(__file__))
+    settingFileName = os.path.join(path, settingFileName)
     #----------------------------------------------------------------------
     def __init__(self, mainEngine, eventEngine):
         """Constructor"""
@@ -163,7 +164,7 @@ class DrEngine(object):
                     self.writeDrLog(u'记录分钟线数据%s，时间:%s, O:%s, H:%s, L:%s, C:%s'
                                         % (newBar.vtSymbol, newBar.time, newBar.open, newBar.high,
                                            newBar.low, newBar.close))
-                    self.procecssBar(newBar)
+                    #self.procecssBar(newBar)
 
                 bar.vtSymbol = drTick.vtSymbol
                 bar.symbol = drTick.symbol

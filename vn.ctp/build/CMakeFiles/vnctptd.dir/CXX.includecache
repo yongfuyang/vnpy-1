@@ -16,23 +16,23 @@ ThostFtdcUserApiStruct.h
 ThostFtdcUserApiDataType.h
 ../ctpapi/x64_linux/ThostFtdcUserApiDataType.h
 
-/home/linlin/Desktop/vnpy/vn.ctp/vnctptd/vnctptd/stdafx.h
+/home/linlin/桌面/vnpy/vn.ctp/vnctptd/vnctptd/stdafx.h
 targetver.h
-/home/linlin/Desktop/vnpy/vn.ctp/vnctptd/vnctptd/targetver.h
+/home/linlin/桌面/vnpy/vn.ctp/vnctptd/vnctptd/targetver.h
 windows.h
 -
 
-/home/linlin/Desktop/vnpy/vn.ctp/vnctptd/vnctptd/targetver.h
+/home/linlin/桌面/vnpy/vn.ctp/vnctptd/vnctptd/targetver.h
 SDKDDKVer.h
 -
 
-/home/linlin/Desktop/vnpy/vn.ctp/vnctptd/vnctptd/vnctptd.cpp
+/home/linlin/桌面/vnpy/vn.ctp/vnctptd/vnctptd/vnctptd.cpp
 vnctptd.h
-/home/linlin/Desktop/vnpy/vn.ctp/vnctptd/vnctptd/vnctptd.h
+/home/linlin/桌面/vnpy/vn.ctp/vnctptd/vnctptd/vnctptd.h
 
-/home/linlin/Desktop/vnpy/vn.ctp/vnctptd/vnctptd/vnctptd.h
+/home/linlin/桌面/vnpy/vn.ctp/vnctptd/vnctptd/vnctptd.h
 stdafx.h
-/home/linlin/Desktop/vnpy/vn.ctp/vnctptd/vnctptd/stdafx.h
+/home/linlin/桌面/vnpy/vn.ctp/vnctptd/vnctptd/stdafx.h
 string
 -
 queue
@@ -54,5 +54,5 @@ boost/bind.hpp
 boost/any.hpp
 -
 ThostFtdcTraderApi.h
-/home/linlin/Desktop/vnpy/vn.ctp/vnctptd/vnctptd/ThostFtdcTraderApi.h
+/home/linlin/桌面/vnpy/vn.ctp/vnctptd/vnctptd/ThostFtdcTraderApi.h
 

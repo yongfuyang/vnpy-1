@@ -8,6 +8,8 @@ from ctaBase import *
 from vtConstant import *
 
 
+from datetime import datetime, timedelta
+
 ########################################################################
 class CtaTemplate(object):
     """CTA策略模板"""
@@ -53,6 +55,10 @@ class CtaTemplate(object):
             for key in self.paramList:
                 if key in setting:
                     d[key] = setting[key]
+        try:
+            self.timesDict = setting['times']
+        except Exception, e:
+            pass
 
     #----------------------------------------------------------------------
     def onInit(self):
@@ -165,5 +171,8 @@ class CtaTemplate(object):
     def putEvent(self):
         """发出策略状态变化事件"""
         self.ctaEngine.putStrategyEvent(self.name)
+
+
+
 
     

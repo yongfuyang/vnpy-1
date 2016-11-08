@@ -4,13 +4,14 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/home/linlin/Desktop/vnpy/vn.ctp/vnctptd/vnctptd/vnctptd.cpp" "/home/linlin/Desktop/vnpy/vn.ctp/build/CMakeFiles/vnctptd.dir/vnctptd/vnctptd/vnctptd.cpp.o"
+  "/home/linlin/桌面/vnpy/vn.ctp/vnctptd/vnctptd/vnctptd.cpp" "/home/linlin/桌面/vnpy/vn.ctp/build/CMakeFiles/vnctptd.dir/vnctptd/vnctptd/vnctptd.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 
 # Preprocessor definitions for this target.
 set(CMAKE_TARGET_DEFINITIONS_CXX
   "BUILD_CTP_MD"
+  "BUILD_CTP_TD"
   "USE_64BITS"
   )
 

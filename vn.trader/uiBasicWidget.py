@@ -1,6 +1,7 @@
 # encoding: UTF-8
 
 import json
+import os
 import csv
 from collections import OrderedDict
 
@@ -15,8 +16,11 @@ from vtGateway import *
 #----------------------------------------------------------------------
 def loadFont():
     """载入字体设置"""
+    fileName = 'VT_setting.json'
+    path = os.path.abspath(os.path.dirname(__file__))
+    fileName = os.path.join(path, fileName)
     try:
-        f = file("VT_setting.json")
+        f = file(fileName)
         setting = json.load(f)
         family = setting['fontFamily']
         size = setting['fontSize']
@@ -358,7 +362,7 @@ class BasicMonitor(QtGui.QTableWidget):
         """清空表格"""
         for row in range(self.rowCount()):
             self.removeRow(0)
-            self.dataDict.clear()
+        self.dataDict.clear()
 
         
     #----------------------------------------------------------------------

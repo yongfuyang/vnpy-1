@@ -1,7 +1,7 @@
 file(REMOVE_RECURSE
   "CMakeFiles/vnctptd.dir/vnctptd/vnctptd/vnctptd.cpp.o"
-  "lib/libvnctptd.pdb"
-  "lib/libvnctptd.so"
+  "lib/vnctptd.pdb"
+  "lib/vnctptd.so"
 )
 
 # Per-language clean rules from dependency scanning.
