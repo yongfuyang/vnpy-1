@@ -308,6 +308,12 @@ class CtaEngine(object):
                 posBuffer.vtSymbol = pos.vtSymbol
                 self.posBufferDict[pos.vtSymbol] = posBuffer
             posBuffer.updatePositionData(pos)
+            for strategy in self.tickStrategyDict[pos.vtSymbol]:
+                if pos.direction == DIRECTION_LONG:
+                    strategy.exchangePos = pos.position
+                else:
+                    strategy.exchangePos = -pos.position
+                strategy.onPosition(pos)
 
     #----------------------------------------------------------------------
     def processExchangePositionEvent(self, event):
@@ -338,7 +344,7 @@ class CtaEngine(object):
         self.eventEngine.register(EVENT_TICK, self.processTickEvent)
         self.eventEngine.register(EVENT_ORDER, self.processOrderEvent)
         self.eventEngine.register(EVENT_TRADE, self.processTradeEvent)
-        self.eventEngine.register(EVENT_POSITION, self.processExchangePositionEvent)
+        self.eventEngine.register(EVENT_POSITION, self.processPositionEvent)
         self.eventEngine.register(EVENT_TIMER, self.onTimer)
 
     #----------------------------------------------------------------------

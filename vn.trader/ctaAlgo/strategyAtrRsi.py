@@ -278,7 +278,7 @@ if __name__ == '__main__':
     engine.setSize(300)  # 股指合约大小
 
     # 设置使用的历史数据库
-    engine.setDatabase(MINUTE_DB_NAME, 'IF0000')
+    engine.setDatabase(MINUTE_DB_NAME, 'ag1612')
 
     ## 在引擎中创建策略对象
     # d = {'atrLength': 11}
