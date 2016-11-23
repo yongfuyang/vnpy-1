@@ -30,7 +30,7 @@ class TrBreakStrategy(CtaTemplate):
     rsiLength = 5           # 计算RSI的窗口数
     rsiEntry = 16           # RSI的开仓信号
     trailingPercent = 1.0   # 百分比移动止损
-    initDays = 10           # 初始化数据所用的天数
+    initDays = 200           # 初始化数据所用的天数
     useTrailingStop = False # 是否使用跟踪止损
     profitLock = 30         # 利润锁定
     trailingStop = 20       # 跟踪止损
@@ -67,6 +67,7 @@ class TrBreakStrategy(CtaTemplate):
     kt2Value = 0
 
     orderList = []                      # 保存委托代码的列表
+    useDayBar = False                   # 使用日线
 
 
 
@@ -123,6 +124,7 @@ class TrBreakStrategy(CtaTemplate):
         initData = self.loadBar(self.initDays)
         for bar in initData:
             self.onBar(bar)
+            self.useDayBar = True
 
         self.putEvent()
 
@@ -147,7 +149,9 @@ class TrBreakStrategy(CtaTemplate):
         if tickMinute != self.barMinute:
             if self.bar:
                 self.onBar(self.bar)
-
+                self.useDayBar = False
+                if self.bar.time == "15:00":
+                    self.useDayBar = True
             bar = CtaBarData()
             bar.vtSymbol = tick.vtSymbol
             bar.symbol = tick.symbol
@@ -170,6 +174,8 @@ class TrBreakStrategy(CtaTemplate):
             bar.high = max(bar.high, tick.lastPrice)
             bar.low = min(bar.low, tick.lastPrice)
             bar.close = tick.lastPrice
+            
+            
 
     #----------------------------------------------------------------------
     def onBar(self, bar):
@@ -182,11 +188,11 @@ class TrBreakStrategy(CtaTemplate):
         self.orderList = []
 
         # 保存K线数据
-        if bat.time == "21:00":
+        if useDayBar:
             self.closeArray[0:self.bufferSize-1] = self.closeArray[1:self.bufferSize]
             self.highArray[0:self.bufferSize-1] = self.highArray[1:self.bufferSize]
             self.lowArray[0:self.bufferSize-1] = self.lowArray[1:self.bufferSize]
-            self.hasPosOnToday = False              #当日没有开过仓
+        self.hasPosOnToday = False              #当日没有开过仓
 
 
         self.closeArray[-1] = bar.close
@@ -198,7 +204,7 @@ class TrBreakStrategy(CtaTemplate):
                                        abs(self.closeArray[-2] - self.highArray[-1])),
                                        abs(self.closeArray[-2] - self.lowArray[-1]))
             
-            if bar.time == "21:00"
+            if useDayBar:
                 self.trArray[0:self.bufferSize - 1] = self.trArray[1:self.bufferSize]
             self.trArray[-1] = self.trValue
 
@@ -209,7 +215,7 @@ class TrBreakStrategy(CtaTemplate):
 
         # 计算指标数值
         self.atrValue = talib.MA(self.trArray,self.atrLength)[-1]
-        if bar.time == "21:00":                                                    
+        if useDayBar:                                                  
             self.atrArray[0:self.bufferSize-1] = self.atrArray[1:self.bufferSize]
         self.atrArray[-1] = self.atrValue
 
@@ -219,23 +225,23 @@ class TrBreakStrategy(CtaTemplate):
 
         if self.closeArray[-1] > self.closeArray[-2] + self.atrArray[-2] * 1.5:
             self.dtValue = 1
-            if bar.time == "21:00":
+            if useDayBar:
                 self.dtArray[0:self.bufferSize-1] = self.dtArray[1:self.bufferSize]
             self.dtArray[-1] = self.dtValue
             if self.dtArray[-2] == 0:
                 self.dt2Value = 1
-                if bar.time == "21:00":
+                if useDayBar:
                     self.dt2Array[0:self.bufferSize-1] = self.dt2Array[1:self.bufferSize]
                 self.dt2Array[-1] = self.dt2Value
 
         if self.closeArray[-1] < self.closeArray[-2] - self.atrArray[-2] * 1.5:
             self.ktValue = 1
-            if bar.time == "21:00":
+            if useDayBar:
                 self.ktArray[0:self.bufferSize-1] = self.ktArray[1:self.bufferSize]
             self.ktArray[-1] = self.ktValue
             if self.ktArray[-2] == 0:
                 self.kt2Value = 1
-                if bar.time == "21:00":
+                if useDatBar:
                     self.kt2Array[0:self.bufferSize-1] = self.kt2Array[1:self.bufferSize]
                 self.kt2Array[-1] = self.kt2Value
 
