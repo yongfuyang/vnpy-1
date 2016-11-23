@@ -175,16 +175,18 @@ class TrBreakStrategy(CtaTemplate):
     def onBar(self, bar):
         """收到Bar推送（必须由用户继承实现）"""
         # 撤销之前发出的尚未成交的委托（包括限价单和停止单）
-        for orderID in self.orderList:
-            self.cancelOrder(orderID)
+        if self.orderList != []:
+            for orderID in self.orderList:
+                self.cancelOrder(orderID)
+            self.hasPosOnToday = False
         self.orderList = []
 
         # 保存K线数据
-
-        self.closeArray[0:self.bufferSize-1] = self.closeArray[1:self.bufferSize]
-        self.highArray[0:self.bufferSize-1] = self.highArray[1:self.bufferSize]
-        self.lowArray[0:self.bufferSize-1] = self.lowArray[1:self.bufferSize]
-        #self.hasPosOnToday = False              #当日没有开过仓
+        if bat.time == "21:00":
+            self.closeArray[0:self.bufferSize-1] = self.closeArray[1:self.bufferSize]
+            self.highArray[0:self.bufferSize-1] = self.highArray[1:self.bufferSize]
+            self.lowArray[0:self.bufferSize-1] = self.lowArray[1:self.bufferSize]
+            self.hasPosOnToday = False              #当日没有开过仓
 
 
         self.closeArray[-1] = bar.close
@@ -195,7 +197,9 @@ class TrBreakStrategy(CtaTemplate):
             self.trValue = max(max(self.highArray[-1] - self.lowArray[-1],
                                        abs(self.closeArray[-2] - self.highArray[-1])),
                                        abs(self.closeArray[-2] - self.lowArray[-1]))
-            self.trArray[0:self.bufferSize - 1] = self.trArray[1:self.bufferSize]
+            
+            if bar.time == "21:00"
+                self.trArray[0:self.bufferSize - 1] = self.trArray[1:self.bufferSize]
             self.trArray[-1] = self.trValue
 
         self.bufferCount += 1
@@ -205,7 +209,8 @@ class TrBreakStrategy(CtaTemplate):
 
         # 计算指标数值
         self.atrValue = talib.MA(self.trArray,self.atrLength)[-1]
-        self.atrArray[0:self.bufferSize-1] = self.atrArray[1:self.bufferSize]
+        if bar.time == "21:00":                                                    
+            self.atrArray[0:self.bufferSize-1] = self.atrArray[1:self.bufferSize]
         self.atrArray[-1] = self.atrValue
 
         self.atrCount += 1
@@ -214,20 +219,24 @@ class TrBreakStrategy(CtaTemplate):
 
         if self.closeArray[-1] > self.closeArray[-2] + self.atrArray[-2] * 1.5:
             self.dtValue = 1
-            self.dtArray[0:self.bufferSize-1] = self.dtArray[1:self.bufferSize]
+            if bar.time == "21:00":
+                self.dtArray[0:self.bufferSize-1] = self.dtArray[1:self.bufferSize]
             self.dtArray[-1] = self.dtValue
             if self.dtArray[-2] == 0:
                 self.dt2Value = 1
-                self.dt2Array[0:self.bufferSize-1] = self.dt2Array[1:self.bufferSize]
+                if bar.time == "21:00":
+                    self.dt2Array[0:self.bufferSize-1] = self.dt2Array[1:self.bufferSize]
                 self.dt2Array[-1] = self.dt2Value
 
         if self.closeArray[-1] < self.closeArray[-2] - self.atrArray[-2] * 1.5:
             self.ktValue = 1
-            self.ktArray[0:self.bufferSize-1] = self.ktArray[1:self.bufferSize]
+            if bar.time == "21:00":
+                self.ktArray[0:self.bufferSize-1] = self.ktArray[1:self.bufferSize]
             self.ktArray[-1] = self.ktValue
             if self.ktArray[-2] == 0:
                 self.kt2Value = 1
-                self.kt2Array[0:self.bufferSize-1] = self.kt2Array[1:self.bufferSize]
+                if bar.time == "21:00":
+                    self.kt2Array[0:self.bufferSize-1] = self.kt2Array[1:self.bufferSize]
                 self.kt2Array[-1] = self.kt2Value
 
 
