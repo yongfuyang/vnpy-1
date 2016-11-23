@@ -27,8 +27,11 @@ class AtrRsiStrategy(CtaTemplate):
     atrMaLength = 10        # 计算ATR均线的窗口数
     rsiLength = 5           # 计算RSI的窗口数
     rsiEntry = 16           # RSI的开仓信号
-    trailingPercent = 0.8   # 百分比移动止损
+    trailingPercent = 1.0   # 百分比移动止损
     initDays = 10           # 初始化数据所用的天数
+    useTrailingStop = False # 是否使用跟踪止损
+    profitLock = 30         # 利润锁定
+    trailingStop = 20       # 跟踪止损
 
     # 策略变量
     bar = None                  # K线对象
@@ -231,6 +234,7 @@ class AtrRsiStrategy(CtaTemplate):
         # 发出状态更新事件
         self.putEvent()
 
+
     #----------------------------------------------------------------------
     def onOrder(self, order):
         """收到委托变化推送（必须由用户继承实现）"""
@@ -270,12 +274,12 @@ if __name__ == '__main__':
     engine.setBacktestingMode(engine.BAR_MODE)
 
     # 设置回测用的数据起始日期
-    engine.setStartDate('20120101')
+    engine.setStartDate('20161010')
 
     # 设置产品相关参数
     engine.setSlippage(0.2)  # 股指1跳
     engine.setRate(0.3 / 10000)  # 万0.3
-    engine.setSize(300)  # 股指合约大小
+    engine.setSize(15)  # 股指合约大小
 
     # 设置使用的历史数据库
     engine.setDatabase(MINUTE_DB_NAME, 'ag1612')
@@ -294,7 +298,7 @@ if __name__ == '__main__':
     setting = OptimizationSetting()  # 新建一个优化任务设置对象
     setting.setOptimizeTarget('capital')  # 设置优化排序的目标是策略净盈利
     setting.addParameter('atrLength', 11, 20, 1)  # 增加第一个优化参数atrLength，起始11，结束12，步进1
-    setting.addParameter('atrMa', 20, 30, 5)  # 增加第二个优化参数atrMa，起始20，结束30，步进1
+    setting.addParameter('atrMaLength', 20, 30, 5)  # 增加第二个优化参数atrMa，起始20，结束30，步进1
 
     # 性能测试环境：I7-3770，主频3.4G, 8核心，内存16G，Windows 7 专业版
     # 测试时还跑着一堆其他的程序，性能仅供参考

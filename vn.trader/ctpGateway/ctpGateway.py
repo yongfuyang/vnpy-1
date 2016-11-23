@@ -994,7 +994,6 @@ class CtpTdApi(TdApi):
         trade.price = data['Price']
         trade.volume = data['Volume']
         trade.tradeTime = data['TradeTime']
-        
         # 推送
         self.gateway.onTrade(trade)
     

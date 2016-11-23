@@ -4,7 +4,7 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/home/linlin/桌面/vnpy/vn.ctp/vnctpmd/vnctpmd/vnctpmd.cpp" "/home/linlin/桌面/vnpy/vn.ctp/build/CMakeFiles/vnctpmd.dir/vnctpmd/vnctpmd/vnctpmd.cpp.o"
+  "/home/linlin/文档/vnpy/vn.ctp/vnctpmd/vnctpmd/vnctpmd.cpp" "/home/linlin/文档/vnpy/vn.ctp/build/CMakeFiles/vnctpmd.dir/vnctpmd/vnctpmd/vnctpmd.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 

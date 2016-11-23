@@ -527,9 +527,10 @@ class TradeMonitor(BasicMonitor):
         d['tradeTime'] = {'chinese':u'成交时间', 'cellType':BasicCell}
         d['gatewayName'] = {'chinese':u'接口', 'cellType':BasicCell}
         self.setHeaderDict(d)
-        
+        self.setDataKey('vtTradeID')
         self.setEventType(EVENT_TRADE)
         self.setFont(BASIC_FONT)
+        self.setSaveData(True)
         self.initTable()
         self.registerEvent()
 

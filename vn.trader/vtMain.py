@@ -8,11 +8,11 @@ import platform
 import vtPath
 from vtEngine import MainEngine
 from uiMainWindow import *
-
+#from demoUi import *
 # 文件路径名
 path = os.path.abspath(os.path.dirname(__file__))
 ICON_FILENAME = 'vnpy.ico'
-ICON_FILENAME = os.path.join(path, ICON_FILENAME)
+#ICON_FILENAME = os.path.join(path, ICON_FILENAME)
 
 SETTING_FILENAME = 'VT_setting.json'
 SETTING_FILENAME = os.path.join(path, SETTING_FILENAME)

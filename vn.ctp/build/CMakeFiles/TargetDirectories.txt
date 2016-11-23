@@ -1,4 +1,4 @@
-/home/linlin/桌面/vnpy/vn.ctp/build/CMakeFiles/rebuild_cache.dir
-/home/linlin/桌面/vnpy/vn.ctp/build/CMakeFiles/vnctptd.dir
-/home/linlin/桌面/vnpy/vn.ctp/build/CMakeFiles/edit_cache.dir
-/home/linlin/桌面/vnpy/vn.ctp/build/CMakeFiles/vnctpmd.dir
+/home/linlin/文档/vnpy/vn.ctp/build/CMakeFiles/rebuild_cache.dir
+/home/linlin/文档/vnpy/vn.ctp/build/CMakeFiles/vnctptd.dir
+/home/linlin/文档/vnpy/vn.ctp/build/CMakeFiles/edit_cache.dir
+/home/linlin/文档/vnpy/vn.ctp/build/CMakeFiles/vnctpmd.dir
