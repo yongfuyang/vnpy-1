@@ -430,7 +430,7 @@ def loadDayTxt(fileName, dbName, symbol):
         bar.low = float(d['Low'])
         bar.close = float(d['Close'])
         bar.date = datetime.strptime(d['Date'], '%Y/%m/%d').strftime('%Y%m%d')
-        bar.time = "00:00"
+        bar.time = "15:00"
         bar.datetime = datetime.strptime(bar.date, '%Y%m%d')
         bar.volume = d['Vol']
         bar.openInterest = d['Val']
@@ -452,9 +452,9 @@ if __name__ == '__main__':
     
     # 这里将项目中包含的股指日内分钟线csv导入MongoDB，作者电脑耗时大约3分钟
     #loadMcCsv('IF0000_1min.csv', MINUTE_DB_NAME, 'IF0000')
-    loadMinuteTxt('TXTMIN1/SQag12.TXT', MINUTE_DB_NAME, 'ag1612')
-    loadMinuteTxt('TXTMIN5/SQag12.TXT', MINUTE5_DB_NAME, 'ag1612')
-    loadDayTxt('TXTDAY/SQag12.TXT',DAILY_DB_NAME,'ag1612')
-    loadMinuteTxt('TXTMIN1/SQauS12.TXT', MINUTE_DB_NAME, 'au1612')
-    loadMinuteTxt('TXTMIN5/SQauS12.TXT', MINUTE5_DB_NAME, 'au1612')
-    loadDayTxt('TXTDAY/SQauS12.TXT', DAILY_DB_NAME, 'au1612')
+    #loadMinuteTxt('TXTMIN1/SQag12.TXT', MINUTE_DB_NAME, 'ag1612')
+    #loadMinuteTxt('TXTMIN5/SQag12.TXT', MINUTE5_DB_NAME, 'ag1612')
+    loadDayTxt('TXTDAY/SQag00.TXT',DAILY_DB_NAME,'ag0000')
+    #loadMinuteTxt('TXTMIN1/SQauS12.TXT', MINUTE_DB_NAME, 'au1612')
+    #loadMinuteTxt('TXTMIN5/SQauS12.TXT', MINUTE5_DB_NAME, 'au1612')
+    #loadDayTxt('TXTDAY/SQauS12.TXT', DAILY_DB_NAME, 'au1612')
