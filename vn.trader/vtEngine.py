@@ -230,7 +230,7 @@ class MainEngine(object):
                 
             try:
                 # 设置MongoDB操作的超时时间为0.5秒
-                self.dbClient = MongoClient(host, port, serverSelectionTimeoutMS=500)
+                self.dbClient = MongoClient(host, port, connectTimeoutMS=500)
                 # 调用server_info查询服务器状态，防止服务器异常并未连接成功
                 self.dbClient.server_info()
                 self.writeLog(u'MongoDB连接成功')
@@ -245,6 +245,15 @@ class MainEngine(object):
             collection = db[collectionName]
             flt = {'datetime': d['datetime']}
             collection.update_one(flt, {'$set': d}, upsert=True)
+
+
+    #-------------------------------------------------------------------------
+    def dbUpdate(self, dbName, collectionName, d, flt, upsert=False):
+        """向MongoDB中更新数据，d是具体数据， 法律他、是过滤条件，upsert代表若无是否要插入"""
+        if self.dbClient:
+            db = self.dbClient[dbName]
+            collection = db[collectionName]
+            collection.replace_one(flt, d, upsert)
 
     
     #----------------------------------------------------------------------

@@ -22,13 +22,14 @@ class TrBreakStrategy(CtaTemplate):
     className = 'TrBreakStrategy'
     author = u'linlin'
 
+    barDbName = DAILY_DB_NAME
     # 策略参数
-    atrLength = 22  # 计算ATR指标的窗口数
+    atrLength = 11  # 计算ATR指标的窗口数
     atrMaLength = 10  # 计算ATR均线的窗口数
     rsiLength = 5  # 计算RSI的窗口数
     rsiEntry = 16  # RSI的开仓信号
     trailingPercent = 1.0  # 百分比移动止损
-    initDays = 2000  # 初始化数据所用的天数
+    initDays = 200  # 初始化数据所用的天数
     useTrailingStop = False  # 是否使用跟踪止损
     profitLock = 30  # 利润锁定
     trailingStop = 20  # 跟踪止损
@@ -36,6 +37,7 @@ class TrBreakStrategy(CtaTemplate):
     # 策略变量
     bar = None  # K线对象
     barMinute = EMPTY_STRING  # K线当前的分钟
+
 
     bufferSize = 100  # 需要缓存的数据的大小
     bufferCount = 0  # 目前已经缓存了的数据的计数
@@ -139,6 +141,8 @@ class TrBreakStrategy(CtaTemplate):
                 self.useDayBar = False
                 if self.bar.time == "15:00":
                     self.useDayBar = True
+                    if self.hasPosOnToday:
+                        self.hasPosOnToday = False
                 self.onBar(self.bar)
 
             bar = CtaBarData()
@@ -179,12 +183,12 @@ class TrBreakStrategy(CtaTemplate):
             self.closeArray[0:self.bufferSize - 1] = self.closeArray[1:self.bufferSize]
             self.highArray[0:self.bufferSize - 1] = self.highArray[1:self.bufferSize]
             self.lowArray[0:self.bufferSize - 1] = self.lowArray[1:self.bufferSize]
-            self.hasPosOnToday = False              #当日没有开过仓
-
+            self.bufferCount += 1
 
         self.closeArray[-1] = bar.close
         self.highArray[-1] = bar.high
         self.lowArray[-1] = bar.low
+
 
         if self.bufferCount != 0:
             self.trValue = max(max(self.highArray[-1] - self.lowArray[-1],
@@ -193,9 +197,10 @@ class TrBreakStrategy(CtaTemplate):
 
             if self.useDayBar:
                 self.trArray[0:self.bufferSize - 1] = self.trArray[1:self.bufferSize]
+
             self.trArray[-1] = self.trValue
 
-        self.bufferCount += 1
+
         if self.bufferCount < self.atrLength:
             return
 
@@ -203,33 +208,38 @@ class TrBreakStrategy(CtaTemplate):
         self.atrValue = talib.MA(self.trArray, self.atrLength)[-1]
         if self.useDayBar:
             self.atrArray[0:self.bufferSize - 1] = self.atrArray[1:self.bufferSize]
+            self.atrCount += 1
         self.atrArray[-1] = self.atrValue
 
-        self.atrCount += 1
-        if self.atrCount < self.atrLength:
+
+        if self.atrCount < self.bufferSize - self.atrLength:
             return
 
         if self.closeArray[-1] > self.closeArray[-2] + self.atrArray[-2] * 1.5:
             self.dtValue = 1
-            if self.useDayBar:
-                self.dtArray[0:self.bufferSize - 1] = self.dtArray[1:self.bufferSize]
-            self.dtArray[-1] = self.dtValue
-            if self.dtArray[-2] == 0:
-                self.dt2Value = 1
-                if self.useDayBar:
-                    self.dt2Array[0:self.bufferSize - 1] = self.dt2Array[1:self.bufferSize]
-                self.dt2Array[-1] = self.dt2Value
+        if self.useDayBar:
+            self.dtArray[0:self.bufferSize - 1] = self.dtArray[1:self.bufferSize]
+        self.dtArray[-1] = self.dtValue
+        self.dtValue = 0
+        if self.dtArray[-2] == 0 and self.dtArray[-1] == 1:
+            self.dt2Value = 1
+        if self.useDayBar:
+            self.dt2Array[0:self.bufferSize - 1] = self.dt2Array[1:self.bufferSize]
+        self.dt2Array[-1] = self.dt2Value
+        self.dt2Value = 0
 
         if self.closeArray[-1] < self.closeArray[-2] - self.atrArray[-2] * 1.5:
             self.ktValue = 1
-            if self.useDayBar:
-                self.ktArray[0:self.bufferSize - 1] = self.ktArray[1:self.bufferSize]
-            self.ktArray[-1] = self.ktValue
-            if self.ktArray[-2] == 0:
-                self.kt2Value = 1
-                if self.useDayBar:
-                    self.kt2Array[0:self.bufferSize - 1] = self.kt2Array[1:self.bufferSize]
-                self.kt2Array[-1] = self.kt2Value
+        if self.useDayBar:
+            self.ktArray[0:self.bufferSize - 1] = self.ktArray[1:self.bufferSize]
+        self.ktArray[-1] = self.ktValue
+        self.ktValue = 0
+        if self.ktArray[-2] == 0 and self.ktArray[-1] == 1:
+            self.kt2Value = 1
+        if self.useDayBar:
+            self.kt2Array[0:self.bufferSize - 1] = self.kt2Array[1:self.bufferSize]
+        self.kt2Array[-1] = self.kt2Value
+        self.kt2Value = 0
 
         # 判断是否要进行交易
 
@@ -247,7 +257,7 @@ class TrBreakStrategy(CtaTemplate):
                 self.sell(bar.close - 5, 1)
                 self.short(bar.close - 5, 1)
                 self.hasPosOnToday = True
-            if self.dtArray[-5] == 1:
+            if self.dtArray[-6] == 1:
                 self.sell(bar.close - 5, 1)
                 self.hasPosOnToday = True
             elif not self.hasPosOnToday and self.dt2Array[-1] == 1:
@@ -259,7 +269,7 @@ class TrBreakStrategy(CtaTemplate):
                 self.cover(bar.close + 5, 1)
                 self.buy(bar.close + 5, 1)
                 self.hasPosOnToday = True
-            if self.ktArray[-5] == 1:
+            if self.ktArray[-6] == 1:
                 self.cover(bar.close + 5, 1)
                 self.hasPosOnToday = True
             elif not self.hasPosOnToday and self.kt2Array[-1] == 1:
@@ -316,11 +326,12 @@ if __name__ == '__main__':
     engine.setSize(15)  # 股指合约大小
 
     # 设置使用的历史数据库
-    engine.setDatabase(DAILY_DB_NAME, 'ag0000')
+    engine.setDatabase(DAILY_DB_NAME, 'ag1706')
 
     # 在引擎中创建策略对象
-    d = {'atrLength': 11}
+    d = {'atrLength': 10}
     engine.initStrategy(TrBreakStrategy, d)
+    engine.writeTrade = True
 
     # 开始跑回测
     engine.runBacktesting()

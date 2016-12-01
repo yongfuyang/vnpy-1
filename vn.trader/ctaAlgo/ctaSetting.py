@@ -12,8 +12,8 @@
 from ctaDemo import DoubleEmaDemo
 from tbDemo import TalibDoubleSmaDemo
 from strategyAtrRsi import AtrRsiStrategy
-
+from strategyTrBreak import TrBreakStrategy
 STRATEGY_CLASS = {}
 STRATEGY_CLASS['DoubleEmaDemo'] = DoubleEmaDemo
 STRATEGY_CLASS['TalibDoubleSmaDemo'] = TalibDoubleSmaDemo
-STRATEGY_CLASS['AtrRsiStrategy'] = AtrRsiStrategy
+STRATEGY_CLASS['TrBreakStrategy'] = TrBreakStrategy

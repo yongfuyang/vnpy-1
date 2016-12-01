@@ -454,7 +454,7 @@ if __name__ == '__main__':
     #loadMcCsv('IF0000_1min.csv', MINUTE_DB_NAME, 'IF0000')
     #loadMinuteTxt('TXTMIN1/SQag12.TXT', MINUTE_DB_NAME, 'ag1612')
     #loadMinuteTxt('TXTMIN5/SQag12.TXT', MINUTE5_DB_NAME, 'ag1612')
-    loadDayTxt('TXTDAY/SQag00.TXT',DAILY_DB_NAME,'ag0000')
+    loadDayTxt('TXTDAY/SQag00.TXT',DAILY_DB_NAME,'ag1706')
     #loadMinuteTxt('TXTMIN1/SQauS12.TXT', MINUTE_DB_NAME, 'au1612')
     #loadMinuteTxt('TXTMIN5/SQauS12.TXT', MINUTE5_DB_NAME, 'au1612')
     #loadDayTxt('TXTDAY/SQauS12.TXT', DAILY_DB_NAME, 'au1612')

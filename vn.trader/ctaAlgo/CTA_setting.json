@@ -1,8 +1,8 @@
 [
     {
-        "name": "AtrRsiStrategy",
-        "className": "AtrRsiStrategy",
-        "vtSymbol": "ag1612",
+        "name": "TrBreakStrategy",
+        "className": "TrBreakStrategy",
+        "vtSymbol": "ag1706",
         "times":["22:00","23:00","00:00","01:00","02:00","09:30","10:45","13:45","14:45","15:00"]
     },
     {
