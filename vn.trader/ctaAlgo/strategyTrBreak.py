@@ -50,11 +50,7 @@ class TrBreakStrategy(CtaTemplate):
     atrValue = 0  # 最新的ATR指标数值
     atrMa = 0  # ATR移动平均的数值
 
-    rsiValue = 0  # RSI指标的数值
-    rsiBuy = 0  # RSI买开阈值
-    rsiSell = 0  # RSI卖开阈值
-    intraTradeHigh = 0  # 移动止损用的持仓期内最高价
-    intraTradeLow = 0  # 移动止损用的持仓期内最低价
+
 
     dtArray = np.zeros(bufferSize)  # 做多条件的数组
     ktArray = np.zeros(bufferSize)  # 做空条件的数组
@@ -329,7 +325,7 @@ if __name__ == '__main__':
     engine.setDatabase(DAILY_DB_NAME, 'ag1706')
 
     # 在引擎中创建策略对象
-    d = {'atrLength': 10}
+    d = {'atrLength': 11}
     engine.initStrategy(TrBreakStrategy, d)
     engine.writeTrade = True
 
