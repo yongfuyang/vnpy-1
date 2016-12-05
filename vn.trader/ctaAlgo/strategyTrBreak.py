@@ -14,7 +14,7 @@ from ctaTemplate import CtaTemplate
 import talib
 import numpy as np
 import math
-
+from datetime import datetime, timedelta
 
 ########################################################################
 class TrBreakStrategy(CtaTemplate):
@@ -135,7 +135,7 @@ class TrBreakStrategy(CtaTemplate):
         if tickMinute != self.barMinute:
             if self.bar:
                 self.useDayBar = False
-                if self.bar.time == "15:00":
+                if datetime.strptime(self.bar.time,"%H:%M:%S.%f").replace(second=0,microsecond=0) == datetime.strptime("15:00","%H:%M"):
                     self.useDayBar = True
                     if self.hasPosOnToday:
                         self.hasPosOnToday = False
@@ -207,6 +207,7 @@ class TrBreakStrategy(CtaTemplate):
             self.atrCount += 1
         self.atrArray[-1] = self.atrValue
 
+        self.atrValue = self.atrArray[-2]
 
         if self.atrCount < self.bufferSize - self.atrLength:
             return
