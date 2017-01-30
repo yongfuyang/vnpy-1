@@ -280,7 +280,7 @@ class MainEngine(object):
         log = event.dict_['data']
         d = {
             'content': log.logContent,
-            'time': log.logTime,
+            'datetime': log.logTime,
             'gateway': log.gatewayName
         }
         self.dbInsert(LOG_DB_NAME, self.todayDate, d)
