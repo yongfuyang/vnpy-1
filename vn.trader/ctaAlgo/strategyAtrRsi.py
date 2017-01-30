@@ -29,6 +29,7 @@ class AtrRsiStrategy(CtaTemplate):
     rsiEntry = 16           # RSI的开仓信号
     trailingPercent = 1.0   # 百分比移动止损
     initDays = 10           # 初始化数据所用的天数
+    fixedSize = 1           # risk
     useTrailingStop = False # 是否使用跟踪止损
     profitLock = 30         # 利润锁定
     trailingStop = 20       # 跟踪止损
@@ -206,10 +207,10 @@ class AtrRsiStrategy(CtaTemplate):
                 # 使用RSI指标的趋势行情时，会在超买超卖区钝化特征，作为开仓信号
                 if self.rsiValue > self.rsiBuy:
                     # 这里为了保证成交，选择超价5个整指数点下单
-                    self.buy(bar.close+5, 1)
+                    self.buy(bar.close+5, self.fixedSize)
 
                 elif self.rsiValue < self.rsiSell:
-                    self.short(bar.close-5, 1)
+                    self.short(bar.close-5, self.fixedSize)
 
         # 持有多头仓位
         elif self.pos == 1:
@@ -219,7 +220,7 @@ class AtrRsiStrategy(CtaTemplate):
             # 计算多头移动止损
             longStop = self.intraTradeHigh * (1-self.trailingPercent/100)
             # 发出本地止损委托，并且把委托号记录下来，用于后续撤单
-            orderID = self.sell(longStop, 1, stop=True)
+            orderID = self.sell(longStop, abs(self.pos), stop=True)
             self.orderList.append(orderID)
 
         # 持有空头仓位
@@ -228,7 +229,7 @@ class AtrRsiStrategy(CtaTemplate):
             self.intraTradeHigh = bar.high
 
             shortStop = self.intraTradeLow * (1+self.trailingPercent/100)
-            orderID = self.cover(shortStop, 1, stop=True)
+            orderID = self.cover(shortStop, abs(self.pos), stop=True)
             self.orderList.append(orderID)
 
         # 发出状态更新事件

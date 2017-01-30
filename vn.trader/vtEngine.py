@@ -2,6 +2,7 @@
 
 import shelve
 from collections import OrderedDict
+from datetime import datetime
 
 from pymongo import MongoClient
 from pymongo.errors import ConnectionFailure
@@ -22,6 +23,8 @@ class MainEngine(object):
     #----------------------------------------------------------------------
     def __init__(self):
         """Constructor"""
+        #log today datetime
+        self.todayDate = datetime.now().strftime('%Y%m%d')
         # 创建事件引擎
         self.eventEngine = EventEngine2()
         self.eventEngine.start()
@@ -226,7 +229,7 @@ class MainEngine(object):
         """连接MongoDB数据库"""
         if not self.dbClient:
             # 读取MongoDB的设置
-            host, port = loadMongoSetting()
+            host, port, logging = loadMongoSetting()
                 
             try:
                 # 设置MongoDB操作的超时时间为0.5秒
@@ -234,6 +237,10 @@ class MainEngine(object):
                 # 调用server_info查询服务器状态，防止服务器异常并未连接成功
                 self.dbClient.server_info()
                 self.writeLog(u'MongoDB连接成功')
+
+                if logging:
+                    self.eventEngine.register(EVENT_LOG,self.dbLogging)
+
             except ConnectionFailure:
                 self.writeLog(u'MongoDB连接失败')
     
@@ -266,7 +273,18 @@ class MainEngine(object):
             return cursor
         else:
             return None
-    
+
+    #----------------------------------------------------------------------------
+    def dbLogging(self, event):
+        """insert log to mongodb"""
+        log = event.dict['data']
+        d = {
+            'content': log.logContent,
+            'time': log.logTime,
+            'gateway': log.gatewayName
+        }
+        self.dbInsert(LOG_DB_NAME, self.todayDate, d)
+
     #----------------------------------------------------------------------
     def getContract(self, vtSymbol):
         """查询合约"""
