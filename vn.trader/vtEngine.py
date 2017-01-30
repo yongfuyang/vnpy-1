@@ -277,7 +277,7 @@ class MainEngine(object):
     #----------------------------------------------------------------------------
     def dbLogging(self, event):
         """insert log to mongodb"""
-        log = event.dict['data']
+        log = event.dict_['data']
         d = {
             'content': log.logContent,
             'time': log.logTime,
