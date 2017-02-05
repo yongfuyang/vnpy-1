@@ -154,7 +154,7 @@ class DualThrustStrategy(CtaTemplate):
             bar.low = min(bar.low, tick.lastPrice)
             bar.close = tick.lastPrice
         #收盘更新日线数据
-        if datetime.strptime(tick.datetime, "%H:%M:%S.%f").replace(second=0, microsecond=0) == datetime.strptime("15:00",
+        if datetime.strptime(tick.time, "%H:%M:%S.%f").replace(second=0, microsecond=0) == datetime.strptime("15:00",
                                                                                                              "%H:%M"):
             daybar = CtaBarData()
             daybar.datetime = tick.datetime.replace(hour=0, minute=0, second=0, microsecond=0)
