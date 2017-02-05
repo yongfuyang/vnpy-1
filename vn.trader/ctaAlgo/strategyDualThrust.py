@@ -257,7 +257,7 @@ class DualThrustStrategy(CtaTemplate):
                                   self.atrLength)[-1]
 
         # 发出状态更新事件
-        #self.putEvent()
+        self.putEvent()
 
 
     #----------------------------------------------------------------------
