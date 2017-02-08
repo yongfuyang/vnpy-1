@@ -346,7 +346,7 @@ class CtaEngine(object):
         self.eventEngine.register(EVENT_ORDER, self.processOrderEvent)
         self.eventEngine.register(EVENT_TRADE, self.processTradeEvent)
         self.eventEngine.register(EVENT_POSITION, self.processPositionEvent)
-        self.eventEngine.register(EVENT_POSITION, self.processExchangePositionEvent)
+        #self.eventEngine.register(EVENT_POSITION, self.processExchangePositionEvent)
         self.eventEngine.register(EVENT_TIMER, self.onTimer)
 
     #----------------------------------------------------------------------

@@ -172,8 +172,8 @@ class MainWindow(QtGui.QMainWindow):
         sysMenu.addSeparator()
         if 'Wind' in self.mainEngine.gatewayDict:
             sysMenu.addAction(connectWindAction)
-        # sysMenu.addSeparator()
-        # sysMenu.addAction(connectDbAction)
+        sysMenu.addSeparator()
+        sysMenu.addAction(connectDbAction)
         sysMenu.addSeparator()
         sysMenu.addAction(exitAction)
         
