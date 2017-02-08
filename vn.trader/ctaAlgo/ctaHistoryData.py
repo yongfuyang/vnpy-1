@@ -323,7 +323,7 @@ def loadMcCsv(fileName, dbName, symbol):
     print u'开始读取CSV文件%s中的数据插入到%s的%s中' %(fileName, dbName, symbol)
     
     # 锁定集合，并创建索引
-    host, port = loadMongoSetting()
+    host, port, logging = loadMongoSetting()
     
     client = pymongo.MongoClient(host, port)    
     collection = client[dbName][symbol]
@@ -361,7 +361,7 @@ def loadMinuteTxt(fileName, dbName, symbol):
     print u'开始读取CSV文件%s中的数据插入到%s的%s中' %(fileName, dbName, symbol)
 
     # 锁定集合，并创建索引
-    host, port = loadMongoSetting()
+    host, port, logging = loadMongoSetting()
 
     client = pymongo.MongoClient(host, port)
     collection = client[dbName][symbol]
@@ -406,7 +406,7 @@ def loadDayTxt(fileName, dbName, symbol):
     print u'开始读取CSV文件%s中的数据插入到%s的%s中' %(fileName, dbName, symbol)
 
     # 锁定集合，并创建索引
-    host, port = loadMongoSetting()
+    host, port, logging = loadMongoSetting()
 
     client = pymongo.MongoClient(host, port)
     collection = client[dbName][symbol]
@@ -452,9 +452,9 @@ if __name__ == '__main__':
     
     # 这里将项目中包含的股指日内分钟线csv导入MongoDB，作者电脑耗时大约3分钟
     #loadMcCsv('IF0000_1min.csv', MINUTE_DB_NAME, 'IF0000')
-    #loadMinuteTxt('TXTMIN1/SQag12.TXT', MINUTE_DB_NAME, 'ag1612')
-    #loadMinuteTxt('TXTMIN5/SQag12.TXT', MINUTE5_DB_NAME, 'ag1612')
-    loadDayTxt('TXTDAY/SQag00.TXT',DAILY_DB_NAME,'ag1706')
-    #loadMinuteTxt('TXTMIN1/SQauS12.TXT', MINUTE_DB_NAME, 'au1612')
-    #loadMinuteTxt('TXTMIN5/SQauS12.TXT', MINUTE5_DB_NAME, 'au1612')
-    #loadDayTxt('TXTDAY/SQauS12.TXT', DAILY_DB_NAME, 'au1612')
+    loadMinuteTxt('TXTMIN1/SQag06.TXT', MINUTE_DB_NAME, 'ag1706')
+    loadMinuteTxt('TXTMIN5/SQag06.TXT', MINUTE5_DB_NAME, 'ag1706')
+    loadDayTxt('TXTDAY/SQag06.TXT',DAILY_DB_NAME,'ag1706')
+    loadMinuteTxt('TXTMIN1/SQauS06.TXT', MINUTE_DB_NAME, 'au1706')
+    loadMinuteTxt('TXTMIN5/SQauS06.TXT', MINUTE5_DB_NAME, 'au1706')
+    loadDayTxt('TXTDAY/SQauS06.TXT', DAILY_DB_NAME, 'au1706')
