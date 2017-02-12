@@ -186,11 +186,11 @@ class DualThrustStrategy(CtaTemplate):
 
             if bar.close > self.BuyLine:
                 # 这里为了保证成交，选择超价5个整指数点下单
-                self.buy(bar.close + 5, self.fixedSize)
-
+                orderID = self.buy(bar.close + 5, self.fixedSize)
+                self.orderList.append(orderID)
             elif bar.close < self.SellLine:
-                self.short(bar.close - 5, self.fixedSize)
-
+                orderID = self.short(bar.close - 5, self.fixedSize)
+                self.orderList.append(orderID)
         # 持有多头仓位
         elif self.pos == self.fixedSize:
             # 计算多头持有期内的最高价，以及重置最低价
@@ -202,9 +202,10 @@ class DualThrustStrategy(CtaTemplate):
             orderID = self.sell(longStop, abs(self.pos), stop=True)
             self.orderList.append(orderID)
             #收盘前清仓
-            if datetime.strptime(self.bar.time, "%H:%M:%S.%f").replace(second=0, microsecond=0) == datetime.strptime(
-                "14:58", "%H:%M"):
-                self.sell(bar.close - 5, abs(self.pos))
+            if datetime.strptime(self.bar.time, "%H:%M:%S.%f").replace(second=0, microsecond=0) >= datetime.strptime(
+                "14:55", "%H:%M"):
+                orderID = self.sell(bar.close - 5, abs(self.pos))
+                self.orderList.append(orderID)
         # 持有空头仓位
         elif self.pos == -self.fixedSize:
             self.intraTradeLow = min(self.intraTradeLow, bar.low)
@@ -215,9 +216,10 @@ class DualThrustStrategy(CtaTemplate):
             orderID = self.cover(shortStop, abs(self.pos), stop=True)
             self.orderList.append(orderID)
             #收盘前清仓
-            if datetime.strptime(self.bar.time, "%H:%M:%S.%f").replace(second=0, microsecond=0) == datetime.strptime(
-                "14:58", "%H:%M"):
-                self.cover(bar.close + 5, abs(self.pos))
+            if datetime.strptime(self.bar.time, "%H:%M:%S.%f").replace(second=0, microsecond=0) >= datetime.strptime(
+                "14:55", "%H:%M"):
+                orderID = self.cover(bar.close + 5, abs(self.pos))
+                self.orderList.append(orderID)
         # 发出状态更新事件
         self.putEvent()
 
