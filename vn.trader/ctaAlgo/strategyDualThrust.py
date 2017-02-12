@@ -23,11 +23,11 @@ class DualThrustStrategy(CtaTemplate):
     author = u'用Python的交易员'
     barDbName = DAILY_DB_NAME
     # 策略参数
-    pN = 6                  # 前N天
+    pN = 3                  # 前N天
     Ks = 0.6                # 上破系数
     Kx = 0.6                # 下破系数
     trailingPercent = 1.0   # 百分比移动止损
-    initDays = 30           # 初始化数据所用的天数
+    initDays =100           # 初始化数据所用的天数
     fixedSize = 1           # risk
     useTrailingStop = False # 是否使用跟踪止损
     profitLock = 30         # 利润锁定
@@ -251,10 +251,10 @@ class DualThrustStrategy(CtaTemplate):
         self.BuyLine = self.openArray[-1] + self.Ks * self.RangeValue
         self.SellLine = self.openArray[-1] - self.Kx * self.RangeValue
 
-        self.AtrValue = talib.ATR(self.highArray,
-                                  self.lowArray,
-                                  self.closeArray,
-                                  self.atrLength)[-1]
+        # self.AtrValue = talib.ATR(self.highArray,
+        #                           self.lowArray,
+        #                           self.closeArray,
+        #                           self.atrLength)[-1]
 
         # 发出状态更新事件
         self.putEvent()
