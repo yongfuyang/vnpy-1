@@ -168,6 +168,7 @@ class DualThrustStrategy(CtaTemplate):
             daybar.volume = tick.volume
             daybar.openInterest = tick.openInterest
             self.onBar(daybar)
+            self.isAlreadyTraded = False
 
     #----------------------------------------------------------------------
     def processBar(self, bar):
@@ -178,7 +179,7 @@ class DualThrustStrategy(CtaTemplate):
         self.orderList = []
 
         # 当前无仓位
-        if self.pos == 0:
+        if self.pos == 0 and not self.isAlreadyTraded:
             self.intraTradeHigh = bar.high
             self.intraTradeLow = bar.low
 
@@ -188,9 +189,11 @@ class DualThrustStrategy(CtaTemplate):
                 # 这里为了保证成交，选择超价5个整指数点下单
                 orderID = self.buy(bar.close + 5, self.fixedSize)
                 self.orderList.append(orderID)
+
             elif bar.close < self.SellLine:
                 orderID = self.short(bar.close - 5, self.fixedSize)
                 self.orderList.append(orderID)
+
         # 持有多头仓位
         elif self.pos == self.fixedSize:
             # 计算多头持有期内的最高价，以及重置最低价
@@ -206,6 +209,7 @@ class DualThrustStrategy(CtaTemplate):
                 "14:55", "%H:%M"):
                 orderID = self.sell(bar.close - 5, abs(self.pos))
                 self.orderList.append(orderID)
+            self.isAlreadyTraded = True
         # 持有空头仓位
         elif self.pos == -self.fixedSize:
             self.intraTradeLow = min(self.intraTradeLow, bar.low)
@@ -220,6 +224,7 @@ class DualThrustStrategy(CtaTemplate):
                 "14:55", "%H:%M"):
                 orderID = self.cover(bar.close + 5, abs(self.pos))
                 self.orderList.append(orderID)
+            self.isAlreadyTraded = True
         # 发出状态更新事件
         self.putEvent()
 
@@ -274,16 +279,16 @@ class DualThrustStrategy(CtaTemplate):
     #----------------------------------------------------------------------
     def onPosition(self, pos):
 
-        if  self.isPrePosHaved  or self.isAlreadyTraded:         # 还没有开过仓，或，还没有获取历史仓位
-            return
-        elif pos.position != 0:
+        #if  self.isPrePosHaved  or self.isAlreadyTraded:         # 还没有开过仓，或，还没有获取历史仓位
+        #    return
+        if pos.position != 0:
             if pos.direction == DIRECTION_LONG:
                 self.pos = pos.position
             else:
                 self.pos = -1 * pos.position
             self.lastEntryPrice = pos.price
-            self.isPrePosHaved = True
-
+            #self.isPrePosHaved = True
+            #self.isAlreadyTraded = True
         #print  (u'{0} {1}  历史持仓 {2}  开仓均价 {3}'.format(datetime.now(), self.vtSymbol, self.pos, pos.price))
         #pass
 
