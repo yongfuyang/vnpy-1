@@ -452,9 +452,12 @@ if __name__ == '__main__':
     
     # 这里将项目中包含的股指日内分钟线csv导入MongoDB，作者电脑耗时大约3分钟
     #loadMcCsv('IF0000_1min.csv', MINUTE_DB_NAME, 'IF0000')
-    loadMinuteTxt('TXTMIN1/SQag06.TXT', MINUTE_DB_NAME, 'ag1706')
-    loadMinuteTxt('TXTMIN5/SQag06.TXT', MINUTE5_DB_NAME, 'ag1706')
-    loadDayTxt('TXTDAY/SQag06.TXT',DAILY_DB_NAME,'ag1706')
-    loadMinuteTxt('TXTMIN1/SQauS06.TXT', MINUTE_DB_NAME, 'au1706')
-    loadMinuteTxt('TXTMIN5/SQauS06.TXT', MINUTE5_DB_NAME, 'au1706')
-    loadDayTxt('TXTDAY/SQauS06.TXT', DAILY_DB_NAME, 'au1706')
+    # loadMinuteTxt('TXTMIN1/SQag06.TXT', MINUTE_DB_NAME, 'ag1706')
+    # loadMinuteTxt('TXTMIN5/SQag06.TXT', MINUTE5_DB_NAME, 'ag1706')
+    # loadDayTxt('TXTDAY/SQag06.TXT',DAILY_DB_NAME,'ag1706')
+    # loadMinuteTxt('TXTMIN1/SQauS06.TXT', MINUTE_DB_NAME, 'au1706')
+    # loadMinuteTxt('TXTMIN5/SQauS06.TXT', MINUTE5_DB_NAME, 'au1706')
+    # loadDayTxt('TXTDAY/SQauS06.TXT', DAILY_DB_NAME, 'au1706')
+    loadMinuteTxt('TXTMIN1/SQrb05.TXT', MINUTE_DB_NAME, 'rb1705')
+    loadMinuteTxt('TXTMIN5/SQrb05.TXT', MINUTE5_DB_NAME, 'rb1705')
+    loadDayTxt('TXTDAY/SQrb05.TXT', DAILY_DB_NAME, 'rb1705')
