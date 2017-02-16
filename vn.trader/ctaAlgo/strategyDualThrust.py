@@ -206,7 +206,8 @@ class DualThrustStrategy(CtaTemplate):
             self.orderList.append(orderID)
             #收盘前清仓
             if datetime.strptime(self.bar.time, "%H:%M:%S.%f").replace(second=0, microsecond=0) >= datetime.strptime(
-                "14:55", "%H:%M"):
+                    "14:55", "%H:%M") and datetime.strptime(self.bar.time, "%H:%M:%S.%f").replace(second=0, microsecond=0) <= datetime.strptime(
+                    "15:00", "%H:%M"):
                 orderID = self.sell(bar.close - 5, abs(self.pos))
                 self.orderList.append(orderID)
             self.isAlreadyTraded = True
@@ -221,7 +222,8 @@ class DualThrustStrategy(CtaTemplate):
             self.orderList.append(orderID)
             #收盘前清仓
             if datetime.strptime(self.bar.time, "%H:%M:%S.%f").replace(second=0, microsecond=0) >= datetime.strptime(
-                "14:55", "%H:%M"):
+                    "14:55", "%H:%M") and datetime.strptime(self.bar.time, "%H:%M:%S.%f").replace(second=0, microsecond=0) <= datetime.strptime(
+                    "15:00", "%H:%M"):
                 orderID = self.cover(bar.close + 5, abs(self.pos))
                 self.orderList.append(orderID)
             self.isAlreadyTraded = True
@@ -280,7 +282,7 @@ class DualThrustStrategy(CtaTemplate):
     def onPosition(self, pos):
 
         #if  self.isPrePosHaved  or self.isAlreadyTraded:         # 还没有开过仓，或，还没有获取历史仓位
-        #    return
+        #   return
         if pos.position != 0:
             if pos.direction == DIRECTION_LONG:
                 self.pos = pos.position
