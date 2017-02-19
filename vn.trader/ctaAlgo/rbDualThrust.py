@@ -17,15 +17,15 @@ import numpy as np
 
 
 ########################################################################
-class DualThrustStrategy(CtaTemplate):
+class RbDualThrustStrategy(CtaTemplate):
     """结合ATR和RSI指标的一个分钟线交易策略"""
-    className = 'DualThrustStrategy'
+    className = 'RbDualThrustStrategy'
     author = u'用Python的交易员'
     barDbName = DAILY_DB_NAME
     # 策略参数
     pN = 3                  # 前N天
-    Ks = 0.4                # 上破系数
-    Kx = 0.4                # 下破系数
+    Ks = 0.6                # 上破系数
+    Kx = 0.6                # 下破系数
     trailingPercent = 1.0   # 百分比移动止损
     initDays =100           # 初始化数据所用的天数
     fixedSize = 1           # risk
@@ -84,7 +84,7 @@ class DualThrustStrategy(CtaTemplate):
     #----------------------------------------------------------------------
     def __init__(self, ctaEngine, setting):
         """Constructor"""
-        super(DualThrustStrategy, self).__init__(ctaEngine, setting)
+        super(RbDualThrustStrategy, self).__init__(ctaEngine, setting)
 
         # 注意策略类中的可变对象属性（通常是list和dict等），在策略初始化时需要重新创建，
         # 否则会出现多个策略实例之间数据共享的情况，有可能导致潜在的策略逻辑错误风险，

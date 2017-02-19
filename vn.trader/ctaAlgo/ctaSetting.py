@@ -13,7 +13,11 @@ from ctaDemo import DoubleEmaDemo
 from tbDemo import TalibDoubleSmaDemo
 from strategyAtrRsi import AtrRsiStrategy
 from strategyTrBreak import TrBreakStrategy
+from strategyDualThrust import DualThrustStrategy
+from rbDualThrust import RbDualThrustStrategy
 STRATEGY_CLASS = {}
 STRATEGY_CLASS['DoubleEmaDemo'] = DoubleEmaDemo
 STRATEGY_CLASS['TalibDoubleSmaDemo'] = TalibDoubleSmaDemo
 STRATEGY_CLASS['TrBreakStrategy'] = TrBreakStrategy
+STRATEGY_CLASS['DualThrustStrategy'] = DualThrustStrategy
+STRATEGY_CLASS['RbDualThrustStrategy'] = RbDualThrustStrategy
