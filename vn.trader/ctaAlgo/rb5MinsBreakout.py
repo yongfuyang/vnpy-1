@@ -14,7 +14,7 @@ from ctaTemplate import CtaTemplate
 
 import talib
 import numpy as np
-
+import  math
 
 ########################################################################
 class Rb5MinsBreakoutStrategy(CtaTemplate):
@@ -42,6 +42,7 @@ class Rb5MinsBreakoutStrategy(CtaTemplate):
     highArray = np.zeros(bufferSize)    # K线最高价的数组
     lowArray = np.zeros(bufferSize)     # K线最低价的数组
     closeArray = np.zeros(bufferSize)   # K线收盘价的数组
+    openArray = np.zeros(bufferSize)    # K线开盘价的数组
 
 
     ma1 = 0
@@ -168,38 +169,33 @@ class Rb5MinsBreakoutStrategy(CtaTemplate):
         self.closeArray[0:self.bufferSize-1] = self.closeArray[1:self.bufferSize]
         self.highArray[0:self.bufferSize-1] = self.highArray[1:self.bufferSize]
         self.lowArray[0:self.bufferSize-1] = self.lowArray[1:self.bufferSize]
-
+        self.openArray[0:self.bufferSize - 1] = self.openArray[1:self.bufferSize]
         self.closeArray[-1] = bar.close
         self.highArray[-1] = bar.high
         self.lowArray[-1] = bar.low
+        self.openArray[-1] = bar.open
 
         self.bufferCount += 1
         if self.bufferCount < self.bufferSize:
             return
 
-        npHigh = talib.MAX(self.highArray, self.length)[-1]
-        npHigh1 = talib.MAX(self.highArray[:-2],self.length - 1)[-1]
-        npLow = talib.Min(self.lowArray, self.length)[-1]
-        npLow1 = talib.Min(self.lowArray[:-2],self.length - 1)[-1]
-        ma1 = talib.MA(self.closeArray[:-2], self.length1)[-1]
+        self.npHigh = talib.MAX(self.highArray, self.length)[-1]
+        self.npHigh1 = talib.MAX(self.highArray[:-2],self.length - 1)[-1]
+        self.npLow = talib.Min(self.lowArray, self.length)[-1]
+        self.npLow1 = talib.Min(self.lowArray[:-2],self.length - 1)[-1]
+        self.ma1 = talib.MA(self.closeArray[:-2], self.length1)[-1]
+
+        if bar.high == self.npHigh:
+            self.breakUp = True
+        else:
+            self.breakUp = False
+
+        if bar.low == self.npLow:
+            self.breakDown = True
+        else:
+            self.breakDown = False
 
 
-        # 计算指标数值
-        self.atrValue = talib.ATR(self.highArray,
-                                  self.lowArray,
-                                  self.closeArray,
-                                  self.atrLength)[-1]
-        self.atrArray[0:self.bufferSize-1] = self.atrArray[1:self.bufferSize]
-        self.atrArray[-1] = self.atrValue
-
-        self.atrCount += 1
-        if self.atrCount < self.bufferSize:
-            return
-
-        self.atrMa = talib.MA(self.atrArray,
-                              self.atrMaLength)[-1]
-        self.rsiValue = talib.RSI(self.closeArray,
-                                  self.rsiLength)[-1]
 
         # 判断是否要进行交易
 
@@ -208,37 +204,36 @@ class Rb5MinsBreakoutStrategy(CtaTemplate):
             self.intraTradeHigh = bar.high
             self.intraTradeLow = bar.low
 
-            # ATR数值上穿其移动平均线，说明行情短期内波动加大
-            # 即处于趋势的概率较大，适合CTA开仓
-            if self.atrValue > self.atrMa:
-                # 使用RSI指标的趋势行情时，会在超买超卖区钝化特征，作为开仓信号
-                if self.rsiValue > self.rsiBuy:
-                    # 这里为了保证成交，选择超价5个整指数点下单
-                    self.buy(bar.close+5, self.fixedSize)
-
-                elif self.rsiValue < self.rsiSell:
-                    self.short(bar.close-5, self.fixedSize)
+            if bar.high > self.ma1 and self.breakUp and bar.open > self.lowArray[-2] and \
+                self.openArray[-2] > self.lowArray[-3] and \
+                self.openArray[-2] < self.closeArray[-2]:
+                self.buy(max(max(self.npHigh1, bar.open), self.ma1) + self.zjd, self.fixedSize)
+            if bar.low < self.ma1 and self.breakDown and bar.open < self.highArray[-2] and \
+                self.openArray[-2] < self.highArray[-3] and \
+                self.openArray[-2] > self.closeArray[-2]:
+                self.short(min(min(self.npLow1, bar.open), self.ma1) - self.zjd, self.fixedSize)
 
         # 持有多头仓位
         elif self.pos == 1:
-            # 计算多头持有期内的最高价，以及重置最低价
-            self.intraTradeHigh = max(self.intraTradeHigh, bar.high)
-            self.intraTradeLow = bar.low
-            # 计算多头移动止损
-            longStop = self.intraTradeHigh * (1-self.trailingPercent/100)
-            # 发出本地止损委托，并且把委托号记录下来，用于后续撤单
-            orderID = self.sell(longStop, abs(self.pos), stop=True)
-            self.orderList.append(orderID)
+
+            if self.closeArray[-2] < self.ma1 and self.lowArray[-2] < self.lowArray[-3]:
+                orderID = self.sell(bar.open - self.zjd, self.fixedSize)
+                self.orderList.append(orderID)
+            if bar.low < self.ma1 and self.breakDown and bar.open < self.highArray[-2] and \
+                self.openArray[-2] < self.highArray[-3] and \
+                self.openArray[-2] > self.closeArray[-2]:
+                self.short(min(min(self.npLow1, bar.open), self.ma1) - self.zjd, self.fixedSize)
 
         # 持有空头仓位
         elif self.pos == -1:
-            self.intraTradeLow = min(self.intraTradeLow, bar.low)
-            self.intraTradeHigh = bar.high
 
-            shortStop = self.intraTradeLow * (1+self.trailingPercent/100)
-            orderID = self.cover(shortStop, abs(self.pos), stop=True)
-            self.orderList.append(orderID)
-
+            if self.closeArray[-2] > self.ma1 and self.highArray[-2] > self.highArray[-3]:
+                orderID = self.cover(bar.open + self.zjd, self.fixedSize)
+                self.orderList.append(orderID)
+            if bar.high > self.ma1 and self.breakUp and bar.open > self.lowArray[-2] and \
+                self.openArray[-2] > self.lowArray[-3] and \
+                self.openArray[-2] < self.closeArray[-2]:
+                self.buy(max(max(self.npHigh1, bar.open), self.ma1) + self.zjd, self.fixedSize)
         # 发出状态更新事件
         self.putEvent()
 
