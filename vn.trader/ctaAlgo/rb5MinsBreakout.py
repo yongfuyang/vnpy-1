@@ -15,6 +15,7 @@ from ctaTemplate import CtaTemplate
 import talib
 import numpy as np
 import  math
+import copy
 
 ########################################################################
 class Rb5MinsBreakoutStrategy(CtaTemplate):
@@ -35,6 +36,7 @@ class Rb5MinsBreakoutStrategy(CtaTemplate):
 
     # 策略变量
     bar = None                  # K线对象
+    m5bar = None
     barMinute = EMPTY_STRING    # K线当前的分钟
 
     bufferSize = 100                    # 需要缓存的数据的大小
@@ -66,8 +68,7 @@ class Rb5MinsBreakoutStrategy(CtaTemplate):
                  'vtSymbol',
                  'length',
                  'leanth1',
-                 'zjd',
-                 'trailingPercent']
+                 'zjd']
 
     # 变量列表，保存了变量的名称
     varList = ['inited',
@@ -132,7 +133,7 @@ class Rb5MinsBreakoutStrategy(CtaTemplate):
 
         if tickMinute != self.barMinute:
             if self.bar:
-                self.onBar(self.bar)
+                self.procecssBar(self.bar)
 
             bar = CtaBarData()
             bar.vtSymbol = tick.vtSymbol
@@ -156,6 +157,41 @@ class Rb5MinsBreakoutStrategy(CtaTemplate):
             bar.high = max(bar.high, tick.lastPrice)
             bar.low = min(bar.low, tick.lastPrice)
             bar.close = tick.lastPrice
+
+    #----------------------------------------------------------------------
+    def procecssBar(self,bar):
+        if not  self.m5bar.datetime or bar.datetime.minute % 5 == 1:
+            m5bar = CtaBarData()
+            m5bar.vtSymbol = bar.vtSymbol
+            m5bar.symbol = bar.vtSymbol
+            m5bar.exchange = bar.exchange
+
+            m5bar.open = bar.open
+            m5bar.high = bar.high
+            m5bar.low = bar.low
+            m5bar.close = bar.close
+            m5bar.date = bar.date
+            m5bar.time = bar.time
+            m5bar.datetime = bar.datetime
+            m5bar.volume = bar.volume
+            m5bar.openInterest = bar.openInterest
+            self.m5bar = m5bar
+        else:
+            m5bar = self.m5bar
+            m5bar.high = max(m5bar.high, bar.high)
+            m5bar.low = min(m5bar.low, bar.low)
+            m5bar.close = bar.close
+            m5bar.volume = m5bar.volume + bar.volume
+            m5bar.openInterest = bar.openInterest
+
+        if bar.datetime.minute % 5 == 0:
+            newBar = copy.copy(m5bar)
+            newBar.datetime = bar.datetime.replace(second=0,microsecond=0)
+            newBar.date = bar.date
+            newBar.time = bar.time
+            self.onBar(newBar)
+
+
 
     #----------------------------------------------------------------------
     def onBar(self, bar):
