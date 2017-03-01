@@ -652,40 +652,29 @@ class CtpTdApi(TdApi):
     #----------------------------------------------------------------------
     def onRspQryInvestorPosition(self, data, error, n, last):
         """持仓查询回报"""
+        # 获取缓存字典中的持仓缓存，若无则创建并初始化
+        positionName = '.'.join([data['InstrumentID'], data['PosiDirection']])
+
+        if positionName in self.posBufferDict:
+            posBuffer = self.posBufferDict[positionName]
+        else:
+            posBuffer = PositionBuffer(data, self.gatewayName)
+            self.posBufferDict[positionName] = posBuffer
 
         # 更新持仓缓存，并获取VT系统中持仓对象的返回值
         exchange = self.symbolExchangeDict.get(data['InstrumentID'], EXCHANGE_UNKNOWN)
         size = self.symbolSizeDict.get(data['InstrumentID'], 1)
-        
-        # 获取缓存字典中的持仓缓存，若无则创建并初始化
-        positionName = '.'.join([data['InstrumentID'], data['PosiDirection']])
-        if exchange == EXCHANGE_SHFE:
-            if positionName in self.posBufferDictShfe:
-                posBuffer = self.posBufferDictShfe[positionName]
-            else:
-                posBuffer = PositionBuffer(data,self.gatewayName)
-                self.posBufferDictShfe[positionName] = posBuffer
-        else:
-            if positionName in self.posBufferDict:
-                posBuffer = self.posBufferDict[positionName]
-            else:
-                posBuffer = PositionBuffer(data, self.gatewayName)
-                self.posBufferDict[positionName] = posBuffer
-
-
-
         if exchange == EXCHANGE_SHFE:
             posBuffer.updateShfeBuffer(data, size)
-            if last:
-                for positionName in self.posBufferDictShfe:
-                    pos = self.posBufferDictShfe[positionName].pos
-                    if pos.symbol:
-                        self.gateway.onPosition(pos)
-                self.posBufferDictShfe = {}
         else:
-            pos = posBuffer.updateBuffer(data, size)
-            if pos.symbol:
-                self.gateway.onPosition(pos)
+            posBuffer.updateBuffer(data, size)
+
+        # 所有持仓数据都更新后，再将缓存中的持仓情况发送到事件引擎中
+        if last:
+            for buf in self.posBufferDict.values():
+                pos = buf.getPos()
+                if pos.symbol:
+                    self.gateway.onPosition(pos)
 
     #----------------------------------------------------------------------
     def onRspQryTradingAccount(self, data, error, n, last):

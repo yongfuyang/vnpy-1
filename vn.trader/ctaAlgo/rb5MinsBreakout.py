@@ -15,6 +15,7 @@ from ctaTemplate import CtaTemplate
 import talib
 import numpy as np
 import  math
+import copy
 
 ########################################################################
 class Rb5MinsBreakoutStrategy(CtaTemplate):
@@ -35,6 +36,7 @@ class Rb5MinsBreakoutStrategy(CtaTemplate):
 
     # 策略变量
     bar = None                  # K线对象
+    m5bar = None
     barMinute = EMPTY_STRING    # K线当前的分钟
 
     bufferSize = 100                    # 需要缓存的数据的大小
@@ -65,9 +67,8 @@ class Rb5MinsBreakoutStrategy(CtaTemplate):
                  'author',
                  'vtSymbol',
                  'length',
-                 'leanth1',
-                 'zjd',
-                 'trailingPercent']
+                 'length1',
+                 'zjd']
 
     # 变量列表，保存了变量的名称
     varList = ['inited',
@@ -75,7 +76,7 @@ class Rb5MinsBreakoutStrategy(CtaTemplate):
                'pos',
                'ma1',
                'npHigh',
-               'npHith1',
+               'npHigh1',
                'npLow',
                'npLow1',
                'breakUp',
@@ -100,10 +101,6 @@ class Rb5MinsBreakoutStrategy(CtaTemplate):
     def onInit(self):
         """初始化策略（必须由用户继承实现）"""
         self.writeCtaLog(u'%s策略初始化' %self.name)
-
-        # 初始化RSI入场阈值
-        self.rsiBuy = 50 + self.rsiEntry
-        self.rsiSell = 50 - self.rsiEntry
 
         # 载入历史数据，并采用回放计算的方式初始化策略数值
         initData = self.loadBar(self.initDays)
@@ -132,7 +129,7 @@ class Rb5MinsBreakoutStrategy(CtaTemplate):
 
         if tickMinute != self.barMinute:
             if self.bar:
-                self.onBar(self.bar)
+                self.procecssBar(self.bar)
 
             bar = CtaBarData()
             bar.vtSymbol = tick.vtSymbol
@@ -158,6 +155,41 @@ class Rb5MinsBreakoutStrategy(CtaTemplate):
             bar.close = tick.lastPrice
 
     #----------------------------------------------------------------------
+    def procecssBar(self,bar):
+        if not  self.m5bar or bar.datetime.minute % 5 == 1:
+            m5bar = CtaBarData()
+            m5bar.vtSymbol = bar.vtSymbol
+            m5bar.symbol = bar.vtSymbol
+            m5bar.exchange = bar.exchange
+
+            m5bar.open = bar.open
+            m5bar.high = bar.high
+            m5bar.low = bar.low
+            m5bar.close = bar.close
+            m5bar.date = bar.date
+            m5bar.time = bar.time
+            m5bar.datetime = bar.datetime
+            m5bar.volume = bar.volume
+            m5bar.openInterest = bar.openInterest
+            self.m5bar = m5bar
+        else:
+            m5bar = self.m5bar
+            m5bar.high = max(m5bar.high, bar.high)
+            m5bar.low = min(m5bar.low, bar.low)
+            m5bar.close = bar.close
+            m5bar.volume = m5bar.volume + bar.volume
+            m5bar.openInterest = bar.openInterest
+
+        if bar.datetime.minute % 5 == 0:
+            newBar = copy.copy(m5bar)
+            newBar.datetime = bar.datetime.replace(second=0,microsecond=0)
+            newBar.date = bar.date
+            newBar.time = bar.time
+            self.onBar(newBar)
+
+
+
+    #----------------------------------------------------------------------
     def onBar(self, bar):
         """收到Bar推送（必须由用户继承实现）"""
         # 撤销之前发出的尚未成交的委托（包括限价单和停止单）
@@ -181,8 +213,8 @@ class Rb5MinsBreakoutStrategy(CtaTemplate):
 
         self.npHigh = talib.MAX(self.highArray, self.length)[-1]
         self.npHigh1 = talib.MAX(self.highArray[:-2],self.length - 1)[-1]
-        self.npLow = talib.Min(self.lowArray, self.length)[-1]
-        self.npLow1 = talib.Min(self.lowArray[:-2],self.length - 1)[-1]
+        self.npLow = talib.MIN(self.lowArray, self.length)[-1]
+        self.npLow1 = talib.MIN(self.lowArray[:-2],self.length - 1)[-1]
         self.ma1 = talib.MA(self.closeArray[:-2], self.length1)[-1]
 
         if bar.high == self.npHigh:
