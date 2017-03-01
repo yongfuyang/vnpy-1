@@ -67,7 +67,7 @@ class Rb5MinsBreakoutStrategy(CtaTemplate):
                  'author',
                  'vtSymbol',
                  'length',
-                 'leanth1',
+                 'length1',
                  'zjd']
 
     # 变量列表，保存了变量的名称
@@ -76,7 +76,7 @@ class Rb5MinsBreakoutStrategy(CtaTemplate):
                'pos',
                'ma1',
                'npHigh',
-               'npHith1',
+               'npHigh1',
                'npLow',
                'npLow1',
                'breakUp',
@@ -101,10 +101,6 @@ class Rb5MinsBreakoutStrategy(CtaTemplate):
     def onInit(self):
         """初始化策略（必须由用户继承实现）"""
         self.writeCtaLog(u'%s策略初始化' %self.name)
-
-        # 初始化RSI入场阈值
-        self.rsiBuy = 50 + self.rsiEntry
-        self.rsiSell = 50 - self.rsiEntry
 
         # 载入历史数据，并采用回放计算的方式初始化策略数值
         initData = self.loadBar(self.initDays)
@@ -160,7 +156,7 @@ class Rb5MinsBreakoutStrategy(CtaTemplate):
 
     #----------------------------------------------------------------------
     def procecssBar(self,bar):
-        if not  self.m5bar.datetime or bar.datetime.minute % 5 == 1:
+        if not  self.m5bar or bar.datetime.minute % 5 == 1:
             m5bar = CtaBarData()
             m5bar.vtSymbol = bar.vtSymbol
             m5bar.symbol = bar.vtSymbol
@@ -217,8 +213,8 @@ class Rb5MinsBreakoutStrategy(CtaTemplate):
 
         self.npHigh = talib.MAX(self.highArray, self.length)[-1]
         self.npHigh1 = talib.MAX(self.highArray[:-2],self.length - 1)[-1]
-        self.npLow = talib.Min(self.lowArray, self.length)[-1]
-        self.npLow1 = talib.Min(self.lowArray[:-2],self.length - 1)[-1]
+        self.npLow = talib.MIN(self.lowArray, self.length)[-1]
+        self.npLow1 = talib.MIN(self.lowArray[:-2],self.length - 1)[-1]
         self.ma1 = talib.MA(self.closeArray[:-2], self.length1)[-1]
 
         if bar.high == self.npHigh:
