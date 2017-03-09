@@ -204,8 +204,7 @@ class AtrRsiStrategy(CtaTemplate):
                 self.L1Array[-1] = self.closeArray[-1]
                 self.C1Array[-1] = self.closeArray[-1]
                 self.UPorDOWNArray[-1] = 0
-
-            pass
+            return
 
         if self.UPorDOWNArray[-2] == 1:                     #昨天是上涨
 
@@ -215,22 +214,21 @@ class AtrRsiStrategy(CtaTemplate):
                 self.L1Array[-1] = self.H1Array[-2]
                 self.H1Array[-1] = self.closeArray[-1]
                 self.C1Array[-1] = self.closeArray[-1]
-                self.UPorDOWNArray[-1] = 1
+                self.UPorDOWNArray[-1] = 1                  #表示上涨
 
-            if self.closeArray[-1] < self.L1Array[-2]:      #第二种情况，下跌：今天的收盘价，下跌超过前三个柱子的最低价
-                a = -2                                      #低过前一个柱子的最低价，才开始计算
+            if self.closeArray[-1] < self.L1Array[-2] :     #第二种情况，下跌：今天的收盘价，下跌超过前三个柱子的最低价
+                                                            #低过前一个柱子的最低价，才开始计算
                 hh = self.L1Array[-2]
                 n = 1
-                a = a - 1
-                while a > -self.bufferCount - 1 :
-                    if self.UPorDOWNArray[a] == 0:break
+                if self.bufferCount > 2:
+                    for a in range(3,self.bufferCount + 1):
+                        if self.UPorDOWNArray[-a] == 0:break
 
-                    if self.H1Array[a] != self.H1Array[a-1]:
-                        n = n + 1;
-                        hh = self.L1Array[a]
+                        if self.H1Array[-a] != self.H1Array[-a + 1]:
+                            n = n + 1;
+                            hh = self.L1Array[-a]
+                        if n == 3: break
 
-                    if n == 3: break
-                    a = a - 1
                 if self.closeArray[-1] < hh:
                     self.O1Array[-1] = self.L1Array[-2]
                     self.H1Array[-1] = self.L1Array[-2]
@@ -238,26 +236,40 @@ class AtrRsiStrategy(CtaTemplate):
                     self.C1Array[-1] = self.closeArray[-1]
                     self.UPorDOWNArray[-1] = 0
 
+        if self.UPorDOWNArray[-2] == 0:                     #昨天是上涨
+
+            if self.closeArray[-1] < self.L1Array[-2]:      #第一种情况，下跌：今天的收盘价超过前一个柱子的最低点
+
+                self.O1Array[-1] = self.L1Array[-2]
+                self.H1Array[-1] = self.L1Array[-2]
+                self.L1Array[-1] = self.closeArray[-1]
+                self.C1Array[-1] = self.closeArray[-1]
+                self.UPorDOWNArray[-1] = 0                  #表示下跌
+
+            if self.closeArray[-1] > self.H1Array[-2] :     #第二种情况，上涨：今天的收盘价，下跌超过前三个柱子的最高价
+                                                            #高过前一个柱子的最高价，才开始计算
+                hh = self.H1Array[-2]
+                n = 1
+                if self.bufferCount > 2:
+                    for a in range(3,self.bufferCount + 1):
+                        if self.UPorDOWNArray[-a] == 1:break
+
+                        if self.H1Array[-a] != self.H1Array[-a + 1]:
+                            n = n + 1;
+                            hh = self.H1Array[-a]
+                        if n == 3: break
+
+                if self.closeArray[-1] > hh:
+                    self.O1Array[-1] = self.H1Array[-2]
+                    self.L1Array[-1] = self.H1Array[-2]
+                    self.H1Array[-1] = self.closeArray[-1]
+                    self.C1Array[-1] = self.closeArray[-1]
+                    self.UPorDOWNArray[-1] = 1
 
         if self.bufferCount < self.bufferSize:
             return
 
-        # 计算指标数值
-        self.atrValue = talib.ATR(self.highArray,
-                                  self.lowArray,
-                                  self.closeArray,
-                                  self.atrLength)[-1]
-        self.atrArray[0:self.bufferSize-1] = self.atrArray[1:self.bufferSize]
-        self.atrArray[-1] = self.atrValue
 
-        self.atrCount += 1
-        if self.atrCount < self.bufferSize:
-            return
-
-        self.atrMa = talib.MA(self.atrArray,
-                              self.atrMaLength)[-1]
-        self.rsiValue = talib.RSI(self.closeArray,
-                                  self.rsiLength)[-1]
 
         # 判断是否要进行交易
 
